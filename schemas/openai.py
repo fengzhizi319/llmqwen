@@ -110,47 +110,41 @@ class ModelListResponse(BaseModel):
 
 # 编程专属快捷接口 Request Schemas
 
-class CodeExplainRequest(BaseModel):
-    code: str = Field(..., description="待解释的代码片段")
-    language: Optional[str] = Field(default="python", description="编程语言名称")
+class BaseCodeRequest(BaseModel):
     model: Optional[str] = None
+    language: Optional[str] = Field(default="python", description="编程语言名称")
+    stream: bool = Field(default=False, description="是否使用流式 SSE 实时输出")
+    temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
+    max_tokens: Optional[int] = Field(default=None, ge=1, le=262144)
 
 
-class CodeRefactorRequest(BaseModel):
+class CodeExplainRequest(BaseCodeRequest):
+    code: str = Field(..., description="待解释的代码片段")
+
+
+class CodeRefactorRequest(BaseCodeRequest):
     code: str = Field(..., description="待重构的代码")
     instruction: str = Field(..., description="重构需求说明，例如：提升性能、转换为异步代码")
-    language: Optional[str] = Field(default="python", description="编程语言")
-    model: Optional[str] = None
 
 
-class CodeTestGenerateRequest(BaseModel):
+class CodeTestGenerateRequest(BaseCodeRequest):
     code: str = Field(..., description="需要生成单测的目标代码")
     framework: Optional[str] = Field(default="pytest", description="测试框架，如 pytest, unittest, jest")
-    language: Optional[str] = Field(default="python", description="编程语言")
-    model: Optional[str] = None
 
 
-class CodeFixBugsRequest(BaseModel):
+class CodeFixBugsRequest(BaseCodeRequest):
     code: str = Field(..., description="包含 Bug 的代码段")
     error_message: Optional[str] = Field(default=None, description="错误日志或报错信息")
-    language: Optional[str] = Field(default="python", description="编程语言")
-    model: Optional[str] = None
 
 
-class CodeEditRequest(BaseModel):
+class CodeEditRequest(BaseCodeRequest):
     code: str = Field(..., description="待编辑的代码片段")
     instruction: str = Field(..., description="编辑要求，例如：将函数改写为异步")
-    language: Optional[str] = Field(default="python", description="编程语言")
-    model: Optional[str] = None
 
 
-class CodeReviewRequest(BaseModel):
+class CodeReviewRequest(BaseCodeRequest):
     code: str = Field(..., description="待审查的代码片段")
-    language: Optional[str] = Field(default="python", description="编程语言")
-    model: Optional[str] = None
 
 
-class CodeDocstringRequest(BaseModel):
+class CodeDocstringRequest(BaseCodeRequest):
     code: str = Field(..., description="需要生成文档字符串的代码片段")
-    language: Optional[str] = Field(default="python", description="编程语言")
-    model: Optional[str] = None

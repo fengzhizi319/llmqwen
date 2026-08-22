@@ -11,6 +11,36 @@ BASE_URL = "http://localhost:8000"
 TIMEOUT = 120.0  # 大模型生成超时时间
 
 
+def _stream_print(url: str, payload: dict, label: str):
+    """统一流式请求与打字机输出打印"""
+    print(f"\n{label}")
+    print("⏳ 实时打字机流式出字: ", end="", flush=True)
+    payload["stream"] = True
+    t0 = time.time()
+    try:
+        with httpx.stream("POST", url, json=payload, timeout=TIMEOUT) as resp:
+            if resp.status_code != 200:
+                print(f"\n❌ 请求失败 (Status {resp.status_code}): {resp.read().decode('utf-8')}")
+                return
+            for line in resp.iter_lines():
+                if not line:
+                    continue
+                if line.startswith("data: "):
+                    data_str = line[6:].strip()
+                    if data_str == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(data_str)
+                        content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                        if content:
+                            print(content, end="", flush=True)
+                    except Exception:
+                        pass
+        print(f"\n✅ 流式输出完成 (耗时 {round(time.time() - t0, 2)}s)")
+    except Exception as e:
+        print(f"\n❌ 流式连接异常: {e}")
+
+
 def test_health():
     print("\n--- [1] 检查服务健康状态 ---")
     resp = httpx.get(f"{BASE_URL}/health", timeout=TIMEOUT)
@@ -24,8 +54,8 @@ def test_models():
 
 
 def test_chat_completion():
-    print("\n--- [3] 对话补全 (/v1/chat/completions) ---")
-    print("⏳ 正在请求 27B 大模型生成，请稍候...")
+    print("\n--- [3] 对话补全 (/v1/chat/completions - Non-Stream) ---")
+    print("⏳ 正在请求大模型生成...")
     t0 = time.time()
     payload = {
         "model": "qwen3.8-27b",
@@ -46,32 +76,12 @@ def test_chat_completion():
 
 
 def test_chat_stream():
-    print("\n--- [4] 流式对话补全 (Stream SSE) ---")
-    print("⏳ 实时打字机流式输出: ", end="", flush=True)
     payload = {
         "model": "qwen3.8-27b",
-        "messages": [
-            {"role": "user", "content": "输出数字 1 到 5"}
-        ],
-        "stream": True,
+        "messages": [{"role": "user", "content": "输出数字 1 到 5"}],
         "max_tokens": 50,
     }
-    with httpx.stream("POST", f"{BASE_URL}/v1/chat/completions", json=payload, timeout=TIMEOUT) as resp:
-        for line in resp.iter_lines():
-            if not line:
-                continue
-            if line.startswith("data: "):
-                data_str = line[6:].strip()
-                if data_str == "[DONE]":
-                    break
-                try:
-                    chunk = json.loads(data_str)
-                    content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
-                    if content:
-                        print(content, end="", flush=True)
-                except Exception:
-                    pass
-    print()
+    _stream_print(f"{BASE_URL}/v1/chat/completions", payload, "--- [4] 流式对话补全 (Stream SSE) ---")
 
 
 def test_code_fim_autocomplete():
@@ -91,70 +101,42 @@ def test_code_fim_autocomplete():
     print(f"✅ 补全结果 (耗时 {round(time.time() - t0, 2)}s):", resp.json()["choices"][0]["text"])
 
 
-def test_specialized_code_tools():
-    print("\n--- [6] 专有代码重构工具 (/v1/code/refactor) ---")
-    print("⏳ 正在请求代码重构...")
-    t0 = time.time()
+def test_specialized_code_refactor_stream():
     payload = {
         "code": "nums = [1, 2, 3]\nev = []\nfor x in nums:\n    ev.append(x * 2)",
         "instruction": "简化为列表推导式",
         "language": "python",
+        "max_tokens": 100,
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/refactor", json=payload, timeout=TIMEOUT)
-    if resp.status_code != 200:
-        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
-        return
-    print(f"✅ 重构结果 (耗时 {round(time.time() - t0, 2)}s):")
-    print(resp.json()["choices"][0]["message"]["content"])
+    _stream_print(f"{BASE_URL}/v1/code/refactor", payload, "--- [6] 专有代码重构工具 (Stream SSE) ---")
 
 
-def test_code_inline_edit():
-    print("\n--- [7] 行内代码编辑 (/v1/code/edit) ---")
-    print("⏳ 正在请求代码编辑...")
-    t0 = time.time()
+def test_code_inline_edit_stream():
     payload = {
         "code": "def sum_list(nums):\n    return sum(nums)",
-        "instruction": "添加类型注解与文档",
+        "instruction": "添加类型注解与简洁注释",
         "language": "python",
+        "max_tokens": 100,
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/edit", json=payload, timeout=TIMEOUT)
-    if resp.status_code != 200:
-        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
-        return
-    print(f"✅ 编辑结果 (耗时 {round(time.time() - t0, 2)}s):")
-    print(resp.json()["choices"][0]["message"]["content"])
+    _stream_print(f"{BASE_URL}/v1/code/edit", payload, "--- [7] 行内代码编辑 (Stream SSE) ---")
 
 
-def test_code_review():
-    print("\n--- [8] 代码审查 (/v1/code/review) ---")
-    print("⏳ 正在请求代码审查...")
-    t0 = time.time()
+def test_code_review_stream():
     payload = {
         "code": "def divide(a, b):\n    return a / b",
         "language": "python",
+        "max_tokens": 100,
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/review", json=payload, timeout=TIMEOUT)
-    if resp.status_code != 200:
-        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
-        return
-    print(f"✅ 审查结果 (耗时 {round(time.time() - t0, 2)}s):")
-    print(resp.json()["choices"][0]["message"]["content"])
+    _stream_print(f"{BASE_URL}/v1/code/review", payload, "--- [8] 代码审查 (Stream SSE) ---")
 
 
-def test_code_docstring():
-    print("\n--- [9] 文档字符串生成 (/v1/code/docstring) ---")
-    print("⏳ 正在请求文档字符串生成...")
-    t0 = time.time()
+def test_code_docstring_stream():
     payload = {
         "code": "def multiply(a: float, b: float) -> float:\n    return a * b",
         "language": "python",
+        "max_tokens": 100,
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/docstring", json=payload, timeout=TIMEOUT)
-    if resp.status_code != 200:
-        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
-        return
-    print(f"✅ Docstring 结果 (耗时 {round(time.time() - t0, 2)}s):")
-    print(resp.json()["choices"][0]["message"]["content"])
+    _stream_print(f"{BASE_URL}/v1/code/docstring", payload, "--- [9] 文档字符串生成 (Stream SSE) ---")
 
 
 if __name__ == "__main__":
@@ -164,10 +146,10 @@ if __name__ == "__main__":
         test_chat_completion()
         test_chat_stream()
         test_code_fim_autocomplete()
-        test_specialized_code_tools()
-        test_code_inline_edit()
-        test_code_review()
-        test_code_docstring()
+        test_specialized_code_refactor_stream()
+        test_code_inline_edit_stream()
+        test_code_review_stream()
+        test_code_docstring_stream()
         print("\n🎉 全部 9 项 API 客户端功能验证顺利完成！")
     except httpx.ConnectError:
         print("\n❌ 连接失败：请确保 AI Code Service 服务已启动 (运行 ./start.sh 或 python app.py)")
