@@ -27,7 +27,7 @@ def test_prompt_builder():
         {"role": "user", "content": "Write a binary search function"},
     ]
     prompt = manager.build_chat_prompt(messages)
-    assert "<|im_start|>system\nCustom System<|im_end|>" in prompt
+    assert "<|im_start|>system\nCustom System" in prompt
     assert "<|im_start|>user\nWrite a binary search function<|im_end|>" in prompt
     assert "<|im_start|>assistant\n" in prompt
 

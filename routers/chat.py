@@ -1,12 +1,12 @@
 """
-AI Code Service - Chat Completions API 路由
-符合 OpenAI /v1/chat/completions 标准规范，支持异步非阻塞流式、LRU 缓存与性能追踪
+AI Code Service - Chat Completions & Responses API 路由
+符合 OpenAI /v1/chat/completions 与 /v1/responses 标准规范，支持异步非阻塞流式、LRU 缓存与性能追踪
 """
 
 import json
 import time
 import uuid
-from typing import Dict, Any
+from typing import Dict, Any, List, Union
 from fastapi import APIRouter, HTTPException, Depends, Request, Response
 from fastapi.responses import StreamingResponse
 
@@ -20,7 +20,7 @@ from schemas import (
 from engine import ModelManager
 from engine.cache import ResponseCache
 
-router = APIRouter(tags=["Chat Completions"])
+router = APIRouter(tags=["Chat Completions & Responses"])
 
 
 def get_model_manager(request: Request) -> ModelManager:
@@ -28,12 +28,15 @@ def get_model_manager(request: Request) -> ModelManager:
 
 
 @router.post("/v1/chat/completions")
+@router.post("/chat/completions")
+@router.post("/v1/responses")
+@router.post("/responses")
 async def create_chat_completion(
     req: ChatCompletionRequest,
     response: Response,
     manager: ModelManager = Depends(get_model_manager),
 ):
-    """OpenAI 兼容的对话补全接口"""
+    """OpenAI 兼容的对话补全与 Responses 接口 (支持 /v1/chat/completions 与 /v1/responses)"""
     model_name = req.model or manager.config.default_model
 
     # 验证模型合法性
@@ -43,13 +46,39 @@ async def create_chat_completion(
             detail=f"Model '{model_name}' not found. Available models: {manager.get_model_names()}",
         )
 
-    # 转换为 dict 列表并构建 Prompt
-    msg_dicts = [{"role": m.role, "content": m.content} for m in req.messages]
+    # 标准化解析 messages 与 input/instructions
+    msg_dicts = []
+    if req.instructions:
+        msg_dicts.append({"role": "system", "content": req.instructions})
+
+    if req.messages:
+        for m in req.messages:
+            msg_dicts.append({"role": m.role, "content": m.content})
+    elif req.input is not None:
+        if isinstance(req.input, str):
+            msg_dicts.append({"role": "user", "content": req.input})
+        elif isinstance(req.input, list):
+            for item in req.input:
+                if isinstance(item, dict):
+                    msg_dicts.append({
+                        "role": item.get("role", "user"),
+                        "content": item.get("content", str(item)),
+                    })
+                elif isinstance(item, str):
+                    msg_dicts.append({"role": "user", "content": item})
+                elif hasattr(item, "content"):
+                    msg_dicts.append({"role": getattr(item, "role", "user"), "content": str(item.content)})
+
+    if not msg_dicts:
+        msg_dicts = [{"role": "user", "content": ""}]
+
     prompt = manager.build_chat_prompt(msg_dicts)
 
     engine = manager.get_engine(model_name)
     request_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
     created_time = int(time.time())
+
+    max_toks = req.max_output_tokens or req.max_tokens or 2048
 
     # 计算 Prompt Tokens 并校验上下文长度
     prompt_tokens = engine.count_tokens(prompt)
@@ -79,7 +108,7 @@ async def create_chat_completion(
                 async with manager.generation_semaphore:
                     tokens_gen = engine.async_stream_generate(
                         prompt=prompt,
-                        max_tokens=req.max_tokens or 2048,
+                        max_tokens=max_toks,
                         temperature=req.temperature,
                         top_p=req.top_p,
                         stop=req.stop,
@@ -142,7 +171,7 @@ async def create_chat_completion(
                 async with manager.generation_semaphore:
                     output_text = await engine.async_generate(
                         prompt=prompt,
-                        max_tokens=req.max_tokens or 2048,
+                        max_tokens=max_toks,
                         temperature=req.temperature,
                         top_p=req.top_p,
                         stop=req.stop,

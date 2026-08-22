@@ -117,3 +117,18 @@ def test_chat_prompt_too_long(small_context_client):
     assert response.status_code == 400
     detail = response.json()["detail"].lower()
     assert "too long" in detail or "exceeds" in detail or "context" in detail
+
+
+def test_responses_endpoint_compatibility(client):
+    """测试 OpenAI Responses API (/v1/responses) 兼容端点"""
+    payload = {
+        "model": "qwen3.8-27b",
+        "input": "请解释 Python 列表推导式",
+        "instructions": "你是一个精通 Python 的助手",
+        "max_output_tokens": 50,
+    }
+    response = client.post("/v1/responses", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["choices"]) == 1
+    assert len(data["choices"][0]["message"]["content"]) > 0

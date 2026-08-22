@@ -16,6 +16,7 @@ def get_model_manager(request: Request) -> ModelManager:
 
 
 @router.get("/v1/models", response_model=ModelListResponse)
+@router.get("/models", response_model=ModelListResponse)
 async def list_models(manager: ModelManager = Depends(get_model_manager)):
     """列出所有已配置和可用的模型"""
     models_list = []
@@ -50,6 +51,7 @@ async def list_models(manager: ModelManager = Depends(get_model_manager)):
 
 
 @router.get("/v1/models/{model_id:path}", response_model=ModelInfo)
+@router.get("/models/{model_id:path}", response_model=ModelInfo)
 async def get_model(model_id: str, manager: ModelManager = Depends(get_model_manager)):
     """获取单个模型详细信息"""
     spec = manager.get_model_info(model_id)

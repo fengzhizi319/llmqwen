@@ -16,10 +16,13 @@ class ChatMessage(BaseModel):
 
 class ChatCompletionRequest(BaseModel):
     model: Optional[str] = None
-    messages: List[ChatMessage]
+    messages: Optional[List[ChatMessage]] = None
+    input: Optional[Union[str, List[Any]]] = None
+    instructions: Optional[str] = None
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     top_p: float = Field(default=0.9, ge=0.0, le=1.0)
     max_tokens: Optional[int] = Field(default=2048, ge=1, le=262144)
+    max_output_tokens: Optional[int] = Field(default=None, ge=1, le=262144)
     stream: bool = False
     stop: Optional[Union[str, List[str]]] = None
     seed: Optional[int] = Field(default=None, description="随机种子，用于可复现生成")

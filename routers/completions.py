@@ -27,6 +27,7 @@ def get_model_manager(request: Request) -> ModelManager:
 
 
 @router.post("/v1/completions")
+@router.post("/completions")
 async def create_completion(
     req: CompletionRequest,
     response: Response,
