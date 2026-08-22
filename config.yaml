@@ -8,7 +8,7 @@ server:
     - "*"
   # api_key: "sk-aicodeservice-secret"  # 可选：设置 API Key 鉴权
 
-# 性能优化与显存调优 (针对 128G 统一内存 Mac 深度调优)
+# 深度性能优化与显存调优 (针对 128G 统一内存 Mac 调优)
 performance:
   enable_cache: true               # 启用响应与 Prompt LRU 缓存（高频重复代码查询命中返回 <1ms）
   cache_max_size: 1024              # 缓存最大条目数
@@ -16,9 +16,13 @@ performance:
   max_concurrency: 3                # 并发生成信号量 (256K 上下文推荐 2~3 并发)
   metal_cache_limit_mb: 4096        # Apple Silicon MLX Metal 显存缓存上限 (4GB)
   clear_cache_after_generation: false # 是否在单次大文本生成后主动清理显存碎片
-  stream_chunk_size: 1              # 流式响应 Token 聚合块
+  stream_chunk_size: 1              # 流式响应 Token 聚合块大小
+  kv_bits: 8                        # 🚀 KV Cache 量化位数 (8bit 节省 50% 显存，长文本提速 30%~50%)
+  kv_group_size: 64                 # KV Cache 量化 Group 大小
+  prefill_step_size: 2048           # 🚀 分块预填充 (Chunked Prefill, 压低 256K 超大代码上下文峰值显存)
+  enable_prompt_cache: true         # 🚀 提示词/系统前缀 KV Cache 显存复用 (<5ms 首字秒出)
 
-# 默认模型：切换为 8bit + MTP 完整综合加速版
+# 默认模型：8bit + MTP 完整综合加速版
 default_model: "qwen3.8-27b-8bit-mtp"
 
 # 是否在未加载模型权重时全局使用 Mock 模式（用于测试/无GPU环境）

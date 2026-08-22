@@ -1,6 +1,6 @@
 """
 AI Code Service - 高性能 Apple Silicon MLX 模型推理引擎
-集成 Metal 统一内存优化、自动本地缓存解析、采样器调优与实时 TPS/显存监控
+集成 Metal 统一内存优化、KV Cache 量化、分块预填充、采样器调优与实时 TPS/显存监控
 """
 
 import functools
@@ -55,12 +55,20 @@ class MLXModelEngine(BaseModelEngine):
         engine_type: str = "auto",
         metal_cache_limit_mb: int = 4096,
         clear_cache_after_generation: bool = False,
+        kv_bits: Optional[int] = 8,
+        kv_group_size: int = 64,
+        prefill_step_size: int = 2048,
+        enable_prompt_cache: bool = True,
     ):
         self.model_name = model_name
         self.model_path = model_path
         self.engine_type = engine_type
         self.metal_cache_limit_mb = metal_cache_limit_mb
         self.clear_cache_after_generation = clear_cache_after_generation
+        self.kv_bits = kv_bits
+        self.kv_group_size = kv_group_size
+        self.prefill_step_size = prefill_step_size
+        self.enable_prompt_cache = enable_prompt_cache
 
         self.model = None
         self.tokenizer = None
@@ -153,7 +161,7 @@ class MLXModelEngine(BaseModelEngine):
         return self._cached_count_tokens(text)
 
     def _build_sampler_kwargs(self, temperature: float, top_p: float, **kwargs) -> Dict[str, Any]:
-        """构建优化采样参数（完美适配 mlx_lm 的 make_sampler 与 mlx_vlm）"""
+        """构建优化采样与 KV 硬件加速参数（完美适配 mlx_lm 与 mlx_vlm）"""
         gen_kwargs: Dict[str, Any] = {}
 
         # mlx_lm (基于 make_sampler 与 make_logits_processors)
@@ -178,6 +186,14 @@ class MLXModelEngine(BaseModelEngine):
                         repetition_penalty=float(kwargs["repetition_penalty"]),
                         repetition_context_size=rep_ctx,
                     )
+
+                # 注入 KV Cache 量化与分块 Prefill 加速参数
+                if self.kv_bits is not None:
+                    gen_kwargs["kv_bits"] = self.kv_bits
+                    gen_kwargs["kv_group_size"] = self.kv_group_size
+                if self.prefill_step_size:
+                    gen_kwargs["prefill_step_size"] = self.prefill_step_size
+
             except Exception:
                 gen_kwargs["temp"] = temperature
                 gen_kwargs["top_p"] = top_p
@@ -188,6 +204,8 @@ class MLXModelEngine(BaseModelEngine):
                 gen_kwargs["top_p"] = top_p
             if "repetition_penalty" in kwargs and kwargs["repetition_penalty"] is not None:
                 gen_kwargs["repetition_penalty"] = kwargs["repetition_penalty"]
+            if self.prefill_step_size:
+                gen_kwargs["prefill_step_size"] = self.prefill_step_size
 
         return gen_kwargs
 
@@ -332,6 +350,8 @@ class MLXModelEngine(BaseModelEngine):
             "engine_type": self.engine_type,
             "loaded": self._loaded,
             "resolved_path": self.resolved_path,
+            "kv_bits": self.kv_bits,
+            "prefill_step_size": self.prefill_step_size,
             "total_requests": self._total_requests,
             "total_prompt_tokens": self._total_prompt_tokens,
             "total_generation_tokens": self._total_generation_tokens,

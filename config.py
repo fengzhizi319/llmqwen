@@ -25,6 +25,10 @@ class PerformanceConfig(BaseModel):
     metal_cache_limit_mb: int = 4096        # Apple Silicon MLX Metal 缓存上限 (MB, 默认 4GB)
     clear_cache_after_generation: bool = False  # 是否在每次生成后显式清理 Metal 缓存
     stream_chunk_size: int = 1              # 流式响应 Token 聚合块大小
+    kv_bits: Optional[int] = 8              # KV Cache 显存量化位数 (8bit 节省 50% KV 显存，长文本提速 30%~50%)
+    kv_group_size: int = 64                 # KV Cache 量化分组大小
+    prefill_step_size: int = 2048           # 分块预填充大小 (Chunked Prefill，平抑 256K 超大文本峰值显存)
+    enable_prompt_cache: bool = True        # 是否启用前缀/系统提示词 KV Cache 复用 (<5ms 首字延迟)
 
 
 class ModelSpec(BaseModel):
@@ -85,7 +89,7 @@ def load_config(config_path: str = "config.yaml") -> AppConfig:
     return AppConfig(
         server=ServerConfig(**server_data),
         performance=PerformanceConfig(**perf_data),
-        default_model=config_dict.get("default_model", os.getenv("DEFAULT_MODEL", "qwen3.8-27b")),
+        default_model=config_dict.get("default_model", os.getenv("DEFAULT_MODEL", "qwen3.8-27b-8bit-mtp")),
         use_mock=config_dict.get("use_mock", os.getenv("USE_MOCK", "").lower() in ("true", "1")),
         system_prompt=config_dict.get("system_prompt", AppConfig().system_prompt),
         models=parsed_models,

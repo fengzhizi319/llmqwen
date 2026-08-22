@@ -81,8 +81,12 @@ class ModelManager:
 
         spec = self.config.models[target_name]
         perf = getattr(self.config, "performance", None)
-        metal_limit = perf.metal_cache_limit_mb if perf else 2048
+        metal_limit = perf.metal_cache_limit_mb if perf else 4096
         clear_cache = perf.clear_cache_after_generation if perf else False
+        kv_bits = perf.kv_bits if perf else 8
+        kv_group_size = perf.kv_group_size if perf else 64
+        prefill_step = perf.prefill_step_size if perf else 2048
+        enable_prompt_cache = perf.enable_prompt_cache if perf else True
 
         try:
             engine = MLXModelEngine(
@@ -91,6 +95,10 @@ class ModelManager:
                 engine_type=spec.engine_type,
                 metal_cache_limit_mb=metal_limit,
                 clear_cache_after_generation=clear_cache,
+                kv_bits=kv_bits,
+                kv_group_size=kv_group_size,
+                prefill_step_size=prefill_step,
+                enable_prompt_cache=enable_prompt_cache,
             )
             self.engines[target_name] = engine
             return engine
