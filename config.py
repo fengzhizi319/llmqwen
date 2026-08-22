@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 class ServerConfig(BaseModel):
     host: str = "0.0.0.0"
-    port: int = 8000
+    port: int = 1235
     reload: bool = False
     cors_origins: List[str] = Field(default_factory=lambda: ["*"])
     api_key: Optional[str] = None

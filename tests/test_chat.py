@@ -76,7 +76,7 @@ def test_chat_completions_invalid_model(client):
 def small_context_client(monkeypatch):
     """上下文长度很小的配置，用于测试 prompt 超限"""
     cfg = AppConfig(
-        server=ServerConfig(host="127.0.0.1", port=8000),
+        server=ServerConfig(host="127.0.0.1", port=1235),
         default_model="qwen3.8-27b",
         use_mock=True,
         models={

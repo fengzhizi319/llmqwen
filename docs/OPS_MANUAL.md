@@ -42,7 +42,7 @@ pip install -r requirements.txt
 项目根目录下的 [`start.sh`](file:///Users/charles/Documents/AI/Python/llmqwen/start.sh) 已经内置了环境自愈、端口占用清理与版本锁定机制：
 
 ```bash
-# 启动 API 服务（默认监听 0.0.0.0:8000）
+# 启动 API 服务（默认监听 0.0.0.0:1235）
 ./start.sh
 
 # 运行自动化测试套件
@@ -51,13 +51,13 @@ pip install -r requirements.txt
 
 ### 2.2 启动流程自愈机制
 1. **自动锁定 Python 3.13**：无论当前终端处于 `base` 还是其他环境，脚本会自动解析并使用 `/opt/homebrew/Caskroom/miniforge/base/envs/llmqwen/bin/python3` 解释器。
-2. **自动释放残留端口**：在启动服务前，脚本会自动检测 `8000` 端口是否被旧进程占有并执行优雅释放，杜绝 `[Errno 48] address already in use` 报错。
+2. **自动释放残留端口**：在启动服务前，脚本会自动检测 `1235` 端口是否被旧进程占有并执行优雅释放，杜绝 `[Errno 48] address already in use` 报错。
 
 ### 2.3 停止服务
 - 前台运行：按下 `Ctrl + C`，服务将捕获信号并执行平滑退出（释放 Metal 显存）。
 - 后台强杀：
   ```bash
-  lsof -ti :8000 | xargs kill -9
+  lsof -ti :1235 | xargs kill -9
   ```
 
 ---
@@ -97,7 +97,7 @@ python convert_to_mlx.py --bits 4 --output ./models/qwen3.8-27b-mlx-4bit
 服务提供了符合云原生规范的 `/health` 健康检查与 `/metrics` 细粒度指标端点。
 
 ### 4.1 健康检查探针 (`GET /health`)
-- **请求示例**：`curl http://localhost:8000/health`
+- **请求示例**：`curl http://localhost:1235/health`
 - **响应示例**：
   ```json
   {
@@ -118,7 +118,7 @@ python convert_to_mlx.py --bits 4 --output ./models/qwen3.8-27b-mlx-4bit
   ```
 
 ### 4.2 性能与显存监控指标 (`GET /metrics`)
-- **请求示例**：`curl http://localhost:8000/metrics`
+- **请求示例**：`curl http://localhost:1235/metrics`
 - **指标说明表**：
 
 | 指标字段 | 类型 | 单位 | 运维说明与健康阈值 |
@@ -136,12 +136,12 @@ python convert_to_mlx.py --bits 4 --output ./models/qwen3.8-27b-mlx-4bit
 ## 5. 常见故障排查指南 (Troubleshooting)
 
 ### 5.1 报错 `[Errno 48] address already in use`
-- **现象**：启动服务时提示 8000 端口已被绑定。
+- **现象**：启动服务时提示 1235 端口已被绑定。
 - **原因**：之前的旧版本服务进程仍在后台运行。
 - **解决方法**：
   ```bash
   # 运行 start.sh 会自动清理，或手动执行：
-  lsof -ti :8000 | xargs kill -9
+  lsof -ti :1235 | xargs kill -9
   ```
 
 ### 5.2 报错 `Symbol not found: __ZN3mlx4core...`

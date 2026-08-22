@@ -12,7 +12,7 @@ import time
 from typing import Dict, List, Any, Optional
 import httpx
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:1235"
 TIMEOUT = 180.0
 
 TEST_SCENARIOS = [

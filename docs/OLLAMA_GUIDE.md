@@ -17,7 +17,7 @@
 
 > **💡 关键结论**：  
 > - 如果你想在 **Ollama** 中运行本地模型，**必须先将 Safetensors 模型转换为 GGUF 格式**。
-> - 如果你的目的是在 **WebUI（如 Open WebUI、Chatbox）、VS Code (Continue)、Cursor** 等软件中使用该模型，**完全不需要经过 Ollama 转换**！只需直接将客户端的 API Base URL 指向本项目的 `http://localhost:8000/v1`，即可同时享受 **MLX 极致性能 (55+ tok/s)** 与 **OpenAI 兼容生态**。
+> - 如果你的目的是在 **WebUI（如 Open WebUI、Chatbox）、VS Code (Continue)、Cursor** 等软件中使用该模型，**完全不需要经过 Ollama 转换**！只需直接将客户端的 API Base URL 指向本项目的 `http://localhost:1235/v1`，即可同时享受 **MLX 极致性能 (55+ tok/s)** 与 **OpenAI 兼容生态**。
 
 ---
 
@@ -139,7 +139,7 @@ ollama run qwen3.8-27b-local
 
 本项目提供的 AI Code Service 服务已经**原生提供了 100% 兼容 OpenAI 的 API 接口**：
 
-- **API Base URL**: `http://localhost:8000/v1`
+- **API Base URL**: `http://localhost:1235/v1`
 - **API Key**: 填 `dummy`（或任意字符串）
 - **Model Name**: `qwen3.8-27b-8bit-mtp`
 

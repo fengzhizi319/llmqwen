@@ -13,7 +13,7 @@ from engine import ModelManager
 def mock_config():
     """提供全 Mock 模式的配置 (默认 256K 上下文)"""
     return AppConfig(
-        server=ServerConfig(host="127.0.0.1", port=8000),
+        server=ServerConfig(host="127.0.0.1", port=1235),
         default_model="qwen3.8-27b",
         use_mock=True,
         models={

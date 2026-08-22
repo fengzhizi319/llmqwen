@@ -7,7 +7,7 @@ import json
 import time
 import httpx
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:1235"
 TIMEOUT = 120.0  # 大模型生成超时时间
 
 

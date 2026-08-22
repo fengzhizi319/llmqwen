@@ -171,7 +171,7 @@ pytest -v
 # 或手动在 conda 环境中运行
 python app.py
 ```
-服务默认运行在 `http://localhost:8000`，交互式 API 文档可通过 `http://localhost:8000/docs` 访问。
+服务默认运行在 `http://localhost:1235`，交互式 API 文档可通过 `http://localhost:1235/docs` 访问。
 
 ### 3. 运行打字机流式验证客户端
 在另一个终端窗口中：
@@ -190,7 +190,7 @@ python client_demo.py
 | 参数项 | 推荐填入值 | 说明 |
 | :--- | :--- | :--- |
 | **API Provider / 类型** | `OpenAI` 或 `OpenAI Compatible` | 兼容标准 OpenAI 协议 |
-| **API Base URL** | `http://localhost:8000/v1` | 服务 API 端点地址 |
+| **API Base URL** | `http://localhost:1235/v1` | 服务 API 端点地址 |
 | **API Key / Token** | `dummy` 或 `sk-aicodeservice-secret` | 未开启鉴权可填任意字符，开启后填对应密钥 |
 | **Model Name (模型名)** | `qwen3.8-27b-8bit-mtp` | 或 `qwen3.8-27b-8bit` |
 | **Context Window (上下文)** | `262144` (256K) | 模型最大上下文 Token 数 |
@@ -212,7 +212,7 @@ Continue 是目前最主流的开源代码助手插件，支持**对话聊天**�
       "title": "Qwen 27B (MLX 8bit + MTP 256K)",
       "provider": "openai",
       "model": "qwen3.8-27b-8bit-mtp",
-      "apiBase": "http://localhost:8000/v1",
+      "apiBase": "http://localhost:1235/v1",
       "apiKey": "dummy",
       "contextLength": 262144
     }
@@ -221,7 +221,7 @@ Continue 是目前最主流的开源代码助手插件，支持**对话聊天**�
     "title": "Qwen FIM Autocomplete",
     "provider": "openai",
     "model": "qwen3.8-27b-8bit-mtp",
-    "apiBase": "http://localhost:8000/v1",
+    "apiBase": "http://localhost:1235/v1",
     "apiKey": "dummy"
   }
 }
@@ -235,7 +235,7 @@ Cursor 原生支持切换为自定义 OpenAI 端点：
 1. 打开 Cursor 设置（`Cmd + ,` 或右上方齿轮图标）。
 2. 进入 **Cursor Settings** -> **Models**。
 3. 开启 **OpenAI API Key**，点击 **Override OpenAI Base URL** 并填入：
-   - **Base URL**: `http://localhost:8000/v1`
+   - **Base URL**: `http://localhost:1235/v1`
    - **API Key**: `dummy`
 4. 在模型列表下方点击 **Add model**，输入 `qwen3.8-27b-8bit-mtp` 并保存选中。
 
@@ -247,7 +247,7 @@ Cursor 原生支持切换为自定义 OpenAI 端点：
 {
   "github.copilot.advanced": {
     "debug.overrideEngine": "qwen3.8-27b-8bit-mtp",
-    "debug.overrideProxyUrl": "http://localhost:8000/v1"
+    "debug.overrideProxyUrl": "http://localhost:1235/v1"
   }
 }
 ```
@@ -258,7 +258,7 @@ Cursor 原生支持切换为自定义 OpenAI 端点：
 1. 在 VS Code 安装 **Cline** 或 **Roo Code** 插件。
 2. 点击插件设置图标（齿轮），进入 API Provider 选择：
    - **API Provider**: 选择 `OpenAI Compatible`
-   - **Base URL**: `http://localhost:8000/v1`
+   - **Base URL**: `http://localhost:1235/v1`
    - **API Key**: `dummy`
    - **Model ID**: `qwen3.8-27b-8bit-mtp`
    - **Context Window**: `262144`
@@ -269,7 +269,7 @@ Cursor 原生支持切换为自定义 OpenAI 端点：
 使用终端 AI 结对编程工具 Aider 时，直接指定环境变量：
 
 ```bash
-export OPENAI_API_BASE="http://localhost:8000/v1"
+export OPENAI_API_BASE="http://localhost:1235/v1"
 export OPENAI_API_KEY="dummy"
 
 # 启动 aider 并指定综合加速模型
@@ -283,7 +283,7 @@ aider --model openai/qwen3.8-27b-8bit-mtp
 ```yaml
 server:
   host: "0.0.0.0"
-  port: 8000
+  port: 1235
   reload: false
   cors_origins: ["*"]
   # api_key: "sk-aicodeservice-secret"  # 取消注释开启 API Key 鉴权
