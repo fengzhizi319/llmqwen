@@ -8,7 +8,7 @@ server:
     - "*"
   # api_key: "sk-aicodeservice-secret"  # 可选：设置 API Key 鉴权
 
-# 性能优化与显存调优 (针对 128G 统一内存 Mac 调优)
+# 性能优化与显存调优 (针对 128G 统一内存 Mac 深度调优)
 performance:
   enable_cache: true               # 启用响应与 Prompt LRU 缓存（高频重复代码查询命中返回 <1ms）
   cache_max_size: 1024              # 缓存最大条目数
@@ -18,8 +18,8 @@ performance:
   clear_cache_after_generation: false # 是否在单次大文本生成后主动清理显存碎片
   stream_chunk_size: 1              # 流式响应 Token 聚合块
 
-# 默认模型：切换为高性能 8bit 量化版 (仅占 28GB 内存，生成速度翻倍)
-default_model: "qwen3.8-27b-8bit"
+# 默认模型：切换为 8bit + MTP 完整综合加速版
+default_model: "qwen3.8-27b-8bit-mtp"
 
 # 是否在未加载模型权重时全局使用 Mock 模式（用于测试/无GPU环境）
 use_mock: false
@@ -40,15 +40,21 @@ system_prompt: |
 
 # 模型配置 (全部支持 256K 超长上下文: 262,144 Tokens)
 models:
+  qwen3.8-27b-8bit-mtp:
+    path: "./models/qwen3.8-27b-8bit-mtp"
+    description: "Qwen3.8-27B MLX 8bit + MTP 完整综合加速版 (支持 256K 上下文)"
+    engine_type: "mlx_lm"
+    context_length: 262144
+
   qwen3.8-27b-8bit:
     path: "lmstudio-community/Qwen3.8-27B-MLX-8bit"
-    description: "Qwen3.8-27B MLX 8bit 量化版本 (高性能首选，支持 256K 上下文)"
+    description: "Qwen3.8-27B MLX 8bit 量化版本 (支持 256K 上下文)"
     engine_type: "mlx_lm"
     context_length: 262144
 
   qwen3.8-27b-mlx:
     path: "inferencerlabs/Qwen3.8-27B-MTP-MLX"
-    description: "Qwen3.8-27B MLX MTP 辅助层 (238MB，支持投机采样加速)"
+    description: "Qwen3.8-27B MLX MTP 辅助层 (238MB)"
     engine_type: "mlx_vlm"
     context_length: 262144
 
