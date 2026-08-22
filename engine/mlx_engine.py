@@ -32,7 +32,12 @@ def resolve_local_model_path(model_path: str) -> str:
         f"~/.cache/modelscope/models/{repo_id_normalized}",
         f"~/.cache/modelscope/hub/{model_path}",
         f"~/.cache/huggingface/hub/models--{repo_id_normalized}/snapshots/*",
+        f"~/.cache/lm-studio/models/{model_path}",
         f"~/.cache/lm-studio/models/*/{model_path}*",
+        f"~/.cache/lm-studio/models/*/{model_path.split('/')[-1]}*",
+        f"~/.lmstudio/models/{model_path}",
+        f"~/.lmstudio/models/*/{model_path}*",
+        f"~/.lmstudio/models/*/{model_path.split('/')[-1]}*",
     ]
     for pattern in search_patterns:
         matches = glob.glob(os.path.expanduser(pattern))
