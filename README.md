@@ -124,6 +124,107 @@ python client_demo.py
 
 ---
 
+## 🔌 在编程助手中配置与使用 (IDE & Copilot 配置指南)
+
+本项目提供标准的 **OpenAI 兼容接口** 与 **FIM 代码补全接口**，可直接无缝接入 VS Code、Cursor、Continue、Cline、GitHub Copilot 生态等各类 AI 编程插件中。
+
+### 📌 核心连接参数速查
+
+| 参数项 | 推荐填入值 | 说明 |
+| :--- | :--- | :--- |
+| **API Provider / 类型** | `OpenAI` 或 `OpenAI Compatible` | 兼容标准 OpenAI 协议 |
+| **API Base URL** | `http://localhost:8000/v1` | 服务 API 端点地址 |
+| **API Key / Token** | `sk-aicodeservice-secret` 或 `dummy` | 若在 `config.yaml` 中配置了密钥则填密钥，未启用可填任意字符 |
+| **Model Name (模型名)** | `qwen3.8-27b` | 或 `qwen3.8-27b-8bit` / `qwen3.8-27b-mlx` |
+| **Context Window (上下文)** | `262144` (256K) | 模型最大上下文 Token 数 |
+| **Max Output Tokens** | `2048` ~ `4096` | 单次输出最大 Token 数 |
+
+---
+
+### 🛠️ 常见编程插件配置示例
+
+#### 1. Continue 插件配置 (VS Code / JetBrains / Cursor)
+Continue 是目前最主流的开源代码助手插件，支持**对话聊天**与 **Tab 键行内 FIM 代码补全**。
+
+打开 Continue 配置文件 `~/.continue/config.json`（或在插件中点击设置），添加如下配置：
+
+```json
+{
+  "models": [
+    {
+      "title": "Qwen 27B (Local MLX 256K)",
+      "provider": "openai",
+      "model": "qwen3.8-27b",
+      "apiBase": "http://localhost:8000/v1",
+      "apiKey": "dummy",
+      "contextLength": 262144
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Qwen FIM Autocomplete",
+    "provider": "openai",
+    "model": "qwen3.8-27b",
+    "apiBase": "http://localhost:8000/v1",
+    "apiKey": "dummy"
+  }
+}
+```
+
+---
+
+#### 2. Cursor IDE 配置
+Cursor 原生支持切换为自定义 OpenAI 端点：
+
+1. 打开 Cursor 设置（`Cmd + ,` 或右上方齿轮图标）。
+2. 进入 **Cursor Settings** -> **Models**。
+3. 开启 **OpenAI API Key**，点击 **Override OpenAI Base URL** 并填入：
+   - **Base URL**: `http://localhost:8000/v1`
+   - **API Key**: `dummy`（或您的 `api_key`）
+4. 在模型列表下方点击 **Add model**，输入 `qwen3.8-27b` 并保存选中。
+
+---
+
+#### 3. GitHub Copilot Chat (VS Code / 自定义代理或 Language Model API)
+在 VS Code 中，GitHub Copilot Chat 支持通过语言模型扩展接口（VS Code Language Model API）或配合自定义端点转发插件（如 Copilot Custom Endpoint Proxy）接入私有模型：
+
+1. **方式一：通过 Continue / Cline 替代并在界面中作为主要 Copilot 面板**
+   - 直接使用 Continue 插件左侧面板，体验完全一致的 Copilot 对话与代码操作。
+2. **方式二：在 VS Code `settings.json` 中配置语言模型端点（适用于支持自定义端点的 Copilot 扩展版本）**：
+   ```json
+   {
+     "github.copilot.advanced": {
+       "debug.overrideEngine": "qwen3.8-27b",
+       "debug.overrideProxyUrl": "http://localhost:8000/v1"
+     }
+   }
+   ```
+
+---
+
+#### 4. Cline / Roo Code 插件配置 (VS Code Autonomous Agent)
+1. 在 VS Code 安装 **Cline** 或 **Roo Code** 插件。
+2. 点击插件设置图标（齿轮），进入 API Provider 选择：
+   - **API Provider**: 选择 `OpenAI Compatible`
+   - **Base URL**: `http://localhost:8000/v1`
+   - **API Key**: `dummy`
+   - **Model ID**: `qwen3.8-27b`
+   - **Context Window**: `262144`
+
+---
+
+#### 5. Aider / 命令行终端编程助手
+使用终端 AI 结对编程工具 Aider 时，直接指定环境变量：
+
+```bash
+export OPENAI_API_BASE="http://localhost:8000/v1"
+export OPENAI_API_KEY="dummy"
+
+# 启动 aider 并指定模型
+aider --model openai/qwen3.8-27b
+```
+
+---
+
 ## ⚡ 性能与配置文件说明 (`config.yaml`)
 
 ```yaml
