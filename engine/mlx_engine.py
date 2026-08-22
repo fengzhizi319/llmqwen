@@ -330,10 +330,13 @@ class MLXModelEngine(BaseModelEngine):
         """获取 Apple Metal 显存状态"""
         try:
             import mlx.core as mx
-            if hasattr(mx, "metal") and mx.metal.is_available():
-                active_mb = round(mx.metal.get_active_memory() / (1024 * 1024), 2)
-                cache_mb = round(mx.metal.get_cache_memory() / (1024 * 1024), 2)
-                peak_mb = round(mx.metal.get_peak_memory() / (1024 * 1024), 2)
+            active_fn = getattr(mx, "get_active_memory", getattr(getattr(mx, "metal", None), "get_active_memory", None))
+            cache_fn = getattr(mx, "get_cache_memory", getattr(getattr(mx, "metal", None), "get_cache_memory", None))
+            peak_fn = getattr(mx, "get_peak_memory", getattr(getattr(mx, "metal", None), "get_peak_memory", None))
+            if active_fn and cache_fn and peak_fn:
+                active_mb = round(active_fn() / (1024 * 1024), 2)
+                cache_mb = round(cache_fn() / (1024 * 1024), 2)
+                peak_mb = round(peak_fn() / (1024 * 1024), 2)
                 return {
                     "active_memory_mb": active_mb,
                     "cache_memory_mb": cache_mb,

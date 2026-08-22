@@ -53,8 +53,10 @@ llmqwen/
 │   ├── mlx_engine.py          # Apple MLX 推理引擎（KV 量化、分块 Prefill、TPS 统计）
 │   ├── mock_engine.py         # Mock 仿真推理引擎
 │   └── manager.py             # 模型统一加载、Prompt 构建器与性能指标聚合
+├── benchmark.py               # 🚀 多模型性能基准压测与自动化对比套件
 ├── docs/                      # 架构设计与运维操作文档
 │   ├── PERFORMANCE_DESIGN.md  # 5大核心维度深度性能优化与系统设计文档
+│   ├── BENCHMARK_REPORT.md    # 📊 多模型性能基准压测报告与对比指南
 │   └── OPS_MANUAL.md          # 运维部署、全链路监控与故障排查手册
 ├── schemas/                   # Pydantic 数据契约对象
 │   └── openai.py              # OpenAI 兼容接口及代码工具 Schema (支持 Stream)

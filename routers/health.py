@@ -46,11 +46,14 @@ async def get_metrics(manager: ModelManager = Depends(get_model_manager)):
     metal_memory = {}
     try:
         import mlx.core as mx
-        if mx.metal.is_available():
+        active_fn = getattr(mx, "get_active_memory", getattr(getattr(mx, "metal", None), "get_active_memory", None))
+        cache_fn = getattr(mx, "get_cache_memory", getattr(getattr(mx, "metal", None), "get_cache_memory", None))
+        peak_fn = getattr(mx, "get_peak_memory", getattr(getattr(mx, "metal", None), "get_peak_memory", None))
+        if active_fn and cache_fn and peak_fn:
             metal_memory = {
-                "active_memory_mb": round(mx.metal.get_active_memory() / (1024 * 1024), 2),
-                "cache_memory_mb": round(mx.metal.get_cache_memory() / (1024 * 1024), 2),
-                "peak_memory_mb": round(mx.metal.get_peak_memory() / (1024 * 1024), 2),
+                "active_memory_mb": round(active_fn() / (1024 * 1024), 2),
+                "cache_memory_mb": round(cache_fn() / (1024 * 1024), 2),
+                "peak_memory_mb": round(peak_fn() / (1024 * 1024), 2),
             }
     except Exception:
         pass
@@ -66,5 +69,6 @@ async def get_metrics(manager: ModelManager = Depends(get_model_manager)):
             "cache": report.get("cache", {}),
             "metal_memory": metal_memory,
             "engine_stats": report.get("engines", {}),
+            "max_concurrency": manager.config.performance.max_concurrency,
         },
     }
