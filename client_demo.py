@@ -6,17 +6,18 @@ AI Code Service - API 客户端测试脚本
 import httpx
 
 BASE_URL = "http://localhost:8000"
+TIMEOUT = 120.0  # 大模型生成超时时间
 
 
 def test_health():
     print("\n--- [1] 检查服务健康状态 ---")
-    resp = httpx.get(f"{BASE_URL}/health")
+    resp = httpx.get(f"{BASE_URL}/health", timeout=TIMEOUT)
     print(f"Status: {resp.status_code}, Response: {resp.json()}")
 
 
 def test_models():
     print("\n--- [2] 获取模型列表 ---")
-    resp = httpx.get(f"{BASE_URL}/v1/models")
+    resp = httpx.get(f"{BASE_URL}/v1/models", timeout=TIMEOUT)
     print(f"Models: {resp.json()}")
 
 
@@ -28,8 +29,12 @@ def test_chat_completion():
             {"role": "user", "content": "请写一个 Python 单例模式 (Singleton) 示例"}
         ],
         "temperature": 0.5,
+        "max_tokens": 512,
     }
-    resp = httpx.post(f"{BASE_URL}/v1/chat/completions", json=payload, timeout=30.0)
+    resp = httpx.post(f"{BASE_URL}/v1/chat/completions", json=payload, timeout=TIMEOUT)
+    if resp.status_code != 200:
+        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
+        return
     data = resp.json()
     print("Response Content:")
     print(data["choices"][0]["message"]["content"])
@@ -44,8 +49,9 @@ def test_chat_stream():
             {"role": "user", "content": "用 30 个字解释 Python 中的 async/await"}
         ],
         "stream": True,
+        "max_tokens": 100,
     }
-    with httpx.stream("POST", f"{BASE_URL}/v1/chat/completions", json=payload, timeout=30.0) as resp:
+    with httpx.stream("POST", f"{BASE_URL}/v1/chat/completions", json=payload, timeout=TIMEOUT) as resp:
         for line in resp.iter_lines():
             if line:
                 print(line)
@@ -59,7 +65,10 @@ def test_code_fim_autocomplete():
         "suffix": "\n    return user_data",
         "max_tokens": 100,
     }
-    resp = httpx.post(f"{BASE_URL}/v1/completions", json=payload, timeout=30.0)
+    resp = httpx.post(f"{BASE_URL}/v1/completions", json=payload, timeout=TIMEOUT)
+    if resp.status_code != 200:
+        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
+        return
     print("Completion Result:", resp.json()["choices"][0]["text"])
 
 
@@ -70,7 +79,10 @@ def test_specialized_code_tools():
         "instruction": "简化为列表推导式",
         "language": "python",
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/refactor", json=payload, timeout=30.0)
+    resp = httpx.post(f"{BASE_URL}/v1/code/refactor", json=payload, timeout=TIMEOUT)
+    if resp.status_code != 200:
+        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
+        return
     print("Refactor Result:")
     print(resp.json()["choices"][0]["message"]["content"])
 
@@ -82,7 +94,10 @@ def test_code_inline_edit():
         "instruction": "使用内置函数简化实现",
         "language": "python",
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/edit", json=payload, timeout=30.0)
+    resp = httpx.post(f"{BASE_URL}/v1/code/edit", json=payload, timeout=TIMEOUT)
+    if resp.status_code != 200:
+        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
+        return
     print("Edit Result:")
     print(resp.json()["choices"][0]["message"]["content"])
 
@@ -93,7 +108,10 @@ def test_code_review():
         "code": "def divide(a, b):\n    return a / b",
         "language": "python",
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/review", json=payload, timeout=30.0)
+    resp = httpx.post(f"{BASE_URL}/v1/code/review", json=payload, timeout=TIMEOUT)
+    if resp.status_code != 200:
+        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
+        return
     print("Review Result:")
     print(resp.json()["choices"][0]["message"]["content"])
 
@@ -104,7 +122,10 @@ def test_code_docstring():
         "code": "def add(a, b):\n    return a + b",
         "language": "python",
     }
-    resp = httpx.post(f"{BASE_URL}/v1/code/docstring", json=payload, timeout=30.0)
+    resp = httpx.post(f"{BASE_URL}/v1/code/docstring", json=payload, timeout=TIMEOUT)
+    if resp.status_code != 200:
+        print(f"❌ 请求失败 (Status {resp.status_code}): {resp.text}")
+        return
     print("Docstring Result:")
     print(resp.json()["choices"][0]["message"]["content"])
 

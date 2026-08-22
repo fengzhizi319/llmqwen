@@ -184,9 +184,17 @@ class MLXModelEngine(BaseModelEngine):
         start_t = time.time()
         with self.lock:
             if self.processor:
-                result = self.generate_fn(self.model, self.processor, prompt, **gen_kwargs)
+                raw_res = self.generate_fn(self.model, self.processor, prompt, **gen_kwargs)
             else:
-                result = self.generate_fn(self.model, self.tokenizer, prompt, **gen_kwargs)
+                raw_res = self.generate_fn(self.model, self.tokenizer, prompt, **gen_kwargs)
+
+            # 确保提取纯文本字符串（兼容 mlx_lm 与 mlx_vlm 返回的 GenerationResult 对象）
+            if hasattr(raw_res, "text"):
+                result = raw_res.text
+            elif isinstance(raw_res, str):
+                result = raw_res
+            else:
+                result = str(raw_res)
 
             # Stop 字符截断
             if stop:
