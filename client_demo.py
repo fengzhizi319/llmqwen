@@ -3,6 +3,7 @@ AI Code Service - API 客户端测试脚本
 在本地启动 `start.sh` 或 `python app.py` 后运行此脚本验证全套接口
 """
 
+import json
 import time
 import httpx
 
@@ -46,7 +47,7 @@ def test_chat_completion():
 
 def test_chat_stream():
     print("\n--- [4] 流式对话补全 (Stream SSE) ---")
-    print("⏳ 实时接收流式 Token:")
+    print("⏳ 实时打字机流式输出: ", end="", flush=True)
     payload = {
         "model": "qwen3.8-27b",
         "messages": [
@@ -57,8 +58,20 @@ def test_chat_stream():
     }
     with httpx.stream("POST", f"{BASE_URL}/v1/chat/completions", json=payload, timeout=TIMEOUT) as resp:
         for line in resp.iter_lines():
-            if line:
-                print(line)
+            if not line:
+                continue
+            if line.startswith("data: "):
+                data_str = line[6:].strip()
+                if data_str == "[DONE]":
+                    break
+                try:
+                    chunk = json.loads(data_str)
+                    content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                    if content:
+                        print(content, end="", flush=True)
+                except Exception:
+                    pass
+    print()
 
 
 def test_code_fim_autocomplete():
