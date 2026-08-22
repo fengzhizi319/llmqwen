@@ -37,7 +37,7 @@ class ModelSpec(BaseModel):
 class AppConfig(BaseModel):
     server: ServerConfig = Field(default_factory=ServerConfig)
     performance: PerformanceConfig = Field(default_factory=PerformanceConfig)
-    default_model: str = "qwen3.8-27b"
+    default_model: str = "qwen3.8-27b-8bit"
     use_mock: bool = False
     system_prompt: str = """你是一个专业的编程助手。你的职责是：
 1. 帮助开发者编写、调试和优化代码
