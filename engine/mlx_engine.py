@@ -1,13 +1,48 @@
 """
 AI Code Service - 高性能 Apple Silicon MLX 模型推理引擎
-集成 Metal 统一内存优化、采样器调优、LRU Token 计数缓存与实时 TPS/显存监控
+集成 Metal 统一内存优化、自动本地缓存解析、采样器调优与实时 TPS/显存监控
 """
 
 import functools
+import glob
+import os
 import threading
 import time
 from typing import Generator, Optional, List, Union, Dict, Any
 from .base import BaseModelEngine
+
+
+def resolve_local_model_path(model_path: str) -> str:
+    """
+    智能解析模型本地路径：
+    1. 若是有效绝对/相对路径或以 ~ 开头，展开后存在则直接返回
+    2. 若是仓库名 (如 Qwen/Qwen3.8-27B 或 lmstudio-community/Qwen3.8-27B-MLX-8bit)，
+       优先搜索 ModelScope 缓存目录 (~/.cache/modelscope/models/.../snapshots/*)
+    3. 搜索 HuggingFace 缓存目录 (~/.cache/huggingface/hub/models--.../snapshots/*)
+    4. 搜索 LM Studio 缓存目录 (~/.cache/lm-studio/models/...)
+    5. 若未在本地缓存中找到，则返回原路径供下游尝试在线加载
+    """
+    expanded = os.path.expanduser(model_path)
+    if os.path.exists(expanded):
+        return expanded
+
+    repo_id_normalized = model_path.replace("/", "--")
+    search_patterns = [
+        f"~/.cache/modelscope/models/{repo_id_normalized}/snapshots/*",
+        f"~/.cache/modelscope/models/{repo_id_normalized}",
+        f"~/.cache/modelscope/hub/{model_path}",
+        f"~/.cache/huggingface/hub/models--{repo_id_normalized}/snapshots/*",
+        f"~/.cache/lm-studio/models/*/{model_path}*",
+    ]
+    for pattern in search_patterns:
+        matches = glob.glob(os.path.expanduser(pattern))
+        for match in sorted(matches, reverse=True):
+            if os.path.isdir(match):
+                # 检查该目录是否包含模型配置文件或权重
+                if any(os.path.exists(os.path.join(match, f)) for f in ("config.json", "params.json", "configuration.json")):
+                    return match
+
+    return expanded
 
 
 class MLXModelEngine(BaseModelEngine):
@@ -18,7 +53,7 @@ class MLXModelEngine(BaseModelEngine):
         model_name: str,
         model_path: str,
         engine_type: str = "auto",
-        metal_cache_limit_mb: int = 2048,
+        metal_cache_limit_mb: int = 4096,
         clear_cache_after_generation: bool = False,
     ):
         self.model_name = model_name
@@ -34,6 +69,7 @@ class MLXModelEngine(BaseModelEngine):
         self.stream_generate_fn = None
         self.lock = threading.Lock()
         self._loaded = False
+        self.resolved_path = None
 
         # 性能统计指标
         self._total_requests = 0
@@ -50,14 +86,16 @@ class MLXModelEngine(BaseModelEngine):
         """初始化 MLX Metal 运行时显存与缓存限制"""
         try:
             import mlx.core as mx
-            if mx.metal.is_available():
-                limit_bytes = self.metal_cache_limit_mb * 1024 * 1024
+            limit_bytes = self.metal_cache_limit_mb * 1024 * 1024
+            if hasattr(mx, "set_cache_limit"):
+                mx.set_cache_limit(limit_bytes)
+            elif hasattr(mx, "metal") and hasattr(mx.metal, "set_cache_limit"):
                 mx.metal.set_cache_limit(limit_bytes)
         except Exception:
             pass
 
     def load_model(self):
-        """延迟加载模型与 Tokenizer"""
+        """延迟加载模型与 Tokenizer（优先从本地 ModelScope/HuggingFace 缓存加载）"""
         if self._loaded:
             return
 
@@ -65,17 +103,18 @@ class MLXModelEngine(BaseModelEngine):
             if self._loaded:
                 return
 
-            print(f"[MLXEngine] 正在从 {self.model_path} 加载模型 {self.model_name}...")
+            self.resolved_path = resolve_local_model_path(self.model_path)
+            print(f"[MLXEngine] 正在从本地路径 '{self.resolved_path}' 加载模型 '{self.model_name}'...")
 
             # 尝试优先使用 mlx_lm
             if self.engine_type in ("auto", "mlx_lm"):
                 try:
                     import mlx_lm
-                    self.model, self.tokenizer = mlx_lm.load(self.model_path)
+                    self.model, self.tokenizer = mlx_lm.load(self.resolved_path)
                     self.generate_fn = mlx_lm.generate
                     self.stream_generate_fn = mlx_lm.stream_generate
                     self._loaded = True
-                    print(f"[MLXEngine] 成功通过 mlx_lm 加载模型: {self.model_name}")
+                    print(f"[MLXEngine] 成功通过 mlx_lm 从本地加载模型: {self.model_name}")
                     return
                 except Exception as e:
                     print(f"[MLXEngine] mlx_lm 加载未成功: {e}，尝试使用 mlx_vlm...")
@@ -84,18 +123,18 @@ class MLXModelEngine(BaseModelEngine):
             if self.engine_type in ("auto", "mlx_vlm"):
                 try:
                     import mlx_vlm
-                    self.model, self.processor = mlx_vlm.load(self.model_path)
+                    self.model, self.processor = mlx_vlm.load(self.resolved_path)
                     self.tokenizer = getattr(self.processor, "tokenizer", self.processor)
                     self.generate_fn = mlx_vlm.generate
                     self.stream_generate_fn = getattr(mlx_vlm, "stream_generate", None)
                     self._loaded = True
-                    print(f"[MLXEngine] 成功通过 mlx_vlm 加载模型: {self.model_name}")
+                    print(f"[MLXEngine] 成功通过 mlx_vlm 从本地加载模型: {self.model_name}")
                     return
                 except Exception as e:
                     print(f"[MLXEngine] mlx_vlm 加载未成功: {e}")
 
             raise RuntimeError(
-                f"无法加载模型 '{self.model_name}' (路径: {self.model_path})，请先运行 download.py 下载模型权重或开启 mock 模式。"
+                f"无法加载模型 '{self.model_name}' (解析路径: {self.resolved_path})，请先运行 download.py 下载模型权重或开启 mock 模式。"
             )
 
     @functools.lru_cache(maxsize=4096)
@@ -231,7 +270,9 @@ class MLXModelEngine(BaseModelEngine):
         """主动清理 Metal 显存缓存"""
         try:
             import mlx.core as mx
-            if mx.metal.is_available():
+            if hasattr(mx, "clear_cache"):
+                mx.clear_cache()
+            elif hasattr(mx, "metal") and hasattr(mx.metal, "clear_cache"):
                 mx.metal.clear_cache()
         except Exception:
             pass
@@ -240,7 +281,7 @@ class MLXModelEngine(BaseModelEngine):
         """获取 Apple Metal 显存状态"""
         try:
             import mlx.core as mx
-            if mx.metal.is_available():
+            if hasattr(mx, "metal") and mx.metal.is_available():
                 active_mb = round(mx.metal.get_active_memory() / (1024 * 1024), 2)
                 cache_mb = round(mx.metal.get_cache_memory() / (1024 * 1024), 2)
                 peak_mb = round(mx.metal.get_peak_memory() / (1024 * 1024), 2)
@@ -259,6 +300,7 @@ class MLXModelEngine(BaseModelEngine):
             "model_name": self.model_name,
             "engine_type": self.engine_type,
             "loaded": self._loaded,
+            "resolved_path": self.resolved_path,
             "total_requests": self._total_requests,
             "total_prompt_tokens": self._total_prompt_tokens,
             "total_generation_tokens": self._total_generation_tokens,
