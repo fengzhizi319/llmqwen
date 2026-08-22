@@ -1,0 +1,59 @@
+# AI Code Service 配置文件
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  cors_origins:
+    - "*"
+  # api_key: "sk-aicodeservice-secret"  # 可选：设置 API Key 鉴权
+
+# 性能优化与显存调优 (针对 128G 统一内存 Mac 调优)
+performance:
+  enable_cache: true               # 启用响应与 Prompt LRU 缓存（高频重复代码查询命中返回 <1ms）
+  cache_max_size: 1024              # 缓存最大条目数
+  cache_ttl_seconds: 3600           # 缓存过期时间（秒）
+  max_concurrency: 3                # 并发生成信号量 (256K 上下文推荐 2~3 并发)
+  metal_cache_limit_mb: 4096        # Apple Silicon MLX Metal 显存缓存上限 (4GB)
+  clear_cache_after_generation: false # 是否在单次大文本生成后主动清理显存碎片
+  stream_chunk_size: 1              # 流式响应 Token 聚合块
+
+# 默认模型
+default_model: "qwen3.8-27b"
+
+# 是否在未加载模型权重时全局使用 Mock 模式（用于测试/无GPU环境）
+use_mock: false
+
+# 编程助手默认 System Prompt
+system_prompt: |
+  你是一个专业的 AI 编程助手。你的职责是：
+  1. 帮助开发者编写、调试和优化代码
+  2. 解释代码逻辑和技术概念
+  3. 提供最佳实践和设计模式建议
+  4. 支持多种编程语言和框架
+
+  回答时请：
+  - 代码示例要完整、可运行
+  - 解释要清晰简洁
+  - 遵循行业最佳实践
+  - 必要时提供多种解决方案
+
+# 模型配置 (全部支持 256K 超长上下文: 262,144 Tokens)
+models:
+  qwen3.8-27b-mlx:
+    path: "inferencerlabs/Qwen3.8-27B-MTP-MLX"
+    description: "Qwen3.8-27B MLX MTP 版本 (支持 256K 上下文)"
+    engine_type: "mlx_vlm"
+    context_length: 262144
+
+  qwen3.8-27b-8bit:
+    path: "lmstudio-community/Qwen3.8-27B-MLX-8bit"
+    description: "Qwen3.8-27B MLX 8bit 量化版本 (支持 256K 上下文)"
+    engine_type: "mlx_lm"
+    context_length: 262144
+
+  qwen3.8-27b:
+    path: "Qwen/Qwen3.8-27B"
+    description: "Qwen3.8-27B 标准版本 (支持 256K 上下文)"
+    engine_type: "auto"
+    context_length: 262144
