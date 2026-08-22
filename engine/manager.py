@@ -112,11 +112,18 @@ class ModelManager:
         """根据消息构建标准 Chat Prompt (符合 Qwen/ChatML 格式)"""
         formatted_messages = list(messages)
         
-        # 确保注入 system prompt
+        # 确保注入 system prompt 并附加防伪造工具调用约束
         has_system = any(m.get("role") == "system" for m in formatted_messages)
         if not has_system:
             sys_content = system_prompt or self.config.system_prompt
             formatted_messages.insert(0, {"role": "system", "content": sys_content})
+        else:
+            for msg in formatted_messages:
+                if msg.get("role") == "system":
+                    content = msg.get("content", "")
+                    guardrail = "\n\n【核心约束】请直接输出解答与完整的带注释代码，禁止输出 <tool_call> 或 <function=...> 标签。如果未收到代码正文，请直接引导用户提供代码或在编辑器中选中代码。"
+                    if "【核心约束】" not in content:
+                        msg["content"] = content + guardrail
 
         prompt_parts = []
         for msg in formatted_messages:
