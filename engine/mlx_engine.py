@@ -153,19 +153,42 @@ class MLXModelEngine(BaseModelEngine):
         return self._cached_count_tokens(text)
 
     def _build_sampler_kwargs(self, temperature: float, top_p: float, **kwargs) -> Dict[str, Any]:
-        """构建优化采样参数（支持 top_k, min_p, repetition_penalty 等）"""
-        gen_kwargs = {
-            "temp": temperature,
-            "top_p": top_p,
-        }
-        if "top_k" in kwargs and kwargs["top_k"] is not None:
-            gen_kwargs["top_k"] = kwargs["top_k"]
-        if "repetition_penalty" in kwargs and kwargs["repetition_penalty"] is not None:
-            gen_kwargs["repetition_penalty"] = kwargs["repetition_penalty"]
-        if "repetition_context_size" in kwargs and kwargs["repetition_context_size"] is not None:
-            gen_kwargs["repetition_context_size"] = kwargs["repetition_context_size"]
-        if "seed" in kwargs and kwargs["seed"] is not None:
-            gen_kwargs["seed"] = kwargs["seed"]
+        """构建优化采样参数（完美适配 mlx_lm 的 make_sampler 与 mlx_vlm）"""
+        gen_kwargs: Dict[str, Any] = {}
+
+        # mlx_lm (基于 make_sampler 与 make_logits_processors)
+        if self.processor is None:
+            try:
+                from mlx_lm.sample_utils import make_sampler, make_logits_processors
+                temp_val = max(0.0, float(temperature))
+                top_p_val = max(0.0, min(1.0, float(top_p))) if top_p is not None else 0.0
+                top_k_val = int(kwargs["top_k"]) if kwargs.get("top_k") else 0
+                min_p_val = float(kwargs["min_p"]) if kwargs.get("min_p") else 0.0
+
+                gen_kwargs["sampler"] = make_sampler(
+                    temp=temp_val,
+                    top_p=top_p_val,
+                    top_k=top_k_val,
+                    min_p=min_p_val,
+                )
+
+                if "repetition_penalty" in kwargs and kwargs["repetition_penalty"] is not None:
+                    rep_ctx = int(kwargs.get("repetition_context_size", 20))
+                    gen_kwargs["logits_processors"] = make_logits_processors(
+                        repetition_penalty=float(kwargs["repetition_penalty"]),
+                        repetition_context_size=rep_ctx,
+                    )
+            except Exception:
+                gen_kwargs["temp"] = temperature
+                gen_kwargs["top_p"] = top_p
+        else:
+            # mlx_vlm
+            gen_kwargs["temperature"] = temperature
+            if top_p is not None:
+                gen_kwargs["top_p"] = top_p
+            if "repetition_penalty" in kwargs and kwargs["repetition_penalty"] is not None:
+                gen_kwargs["repetition_penalty"] = kwargs["repetition_penalty"]
+
         return gen_kwargs
 
     def generate(
