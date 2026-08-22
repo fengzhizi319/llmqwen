@@ -25,7 +25,9 @@ if [ "$CONDA_DEFAULT_ENV" != "$ENV_NAME" ]; then
 fi
 
 # 2. 检查 Python 命令与版本
-if command -v python3 &> /dev/null; then
+if [ -x "/opt/homebrew/Caskroom/miniforge/base/envs/${ENV_NAME}/bin/python3" ]; then
+    PY_BIN="/opt/homebrew/Caskroom/miniforge/base/envs/${ENV_NAME}/bin/python3"
+elif command -v python3 &> /dev/null; then
     PY_BIN="python3"
 elif command -v python &> /dev/null; then
     PY_BIN="python"
@@ -36,7 +38,7 @@ fi
 
 PY_VERSION=$($PY_BIN -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 PY_FULL_VERSION=$($PY_BIN --version 2>&1)
-echo "🐍 当前 Python 环境: $PY_FULL_VERSION ($(which $PY_BIN))"
+echo "🐍 当前 Python 环境: $PY_FULL_VERSION ($PY_BIN)"
 
 # 检查 Python 版本是否满足推荐的 3.13+
 $PY_BIN -c "import sys; sys.exit(0 if sys.version_info >= (3, 13) else 1)" || {
@@ -56,7 +58,16 @@ if [ "$1" == "--test" ]; then
     exit 0
 fi
 
-# 5. 启动服务
+# 5. 清理可能残留的端口占用
+PORT=8000
+OLD_PID=$(lsof -ti :$PORT 2>/dev/null || true)
+if [ -n "$OLD_PID" ]; then
+    echo "🧹 清理端口 $PORT 残留进程 (PID: $OLD_PID)..."
+    kill -9 $OLD_PID 2>/dev/null || true
+    sleep 1
+fi
+
+# 6. 启动服务
 echo "🚀 启动服务..."
 echo "API 地址: http://localhost:8000"
 echo "API 文档: http://localhost:8000/docs"
