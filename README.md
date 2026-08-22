@@ -53,6 +53,9 @@ llmqwen/
 │   ├── mlx_engine.py          # Apple MLX 推理引擎（KV 量化、分块 Prefill、TPS 统计）
 │   ├── mock_engine.py         # Mock 仿真推理引擎
 │   └── manager.py             # 模型统一加载、Prompt 构建器与性能指标聚合
+├── docs/                      # 架构设计与运维操作文档
+│   ├── PERFORMANCE_DESIGN.md  # 5大核心维度深度性能优化与系统设计文档
+│   └── OPS_MANUAL.md          # 运维部署、全链路监控与故障排查手册
 ├── schemas/                   # Pydantic 数据契约对象
 │   └── openai.py              # OpenAI 兼容接口及代码工具 Schema (支持 Stream)
 ├── routers/                   # FastAPI 路由模块
@@ -71,6 +74,13 @@ llmqwen/
     ├── test_engine_and_prompt.py # 引擎与 Prompt 测试
     └── test_performance_and_cache.py # 性能优化与缓存专项测试
 ```
+
+---
+
+## 📚 详细设计与运维手册
+
+- 📖 [深度性能优化与系统架构设计文档 (`docs/PERFORMANCE_DESIGN.md`)](file:///Users/charles/Documents/AI/Python/llmqwen/docs/PERFORMANCE_DESIGN.md)：详细推导 256K 下 8-bit KV Cache 显存量化、分块预填充、Metal 提示词缓存与 MTP 投机采样的数学原理与加速机制。
+- 🛠️ [运维部署、监控与故障排查手册 (`docs/OPS_MANUAL.md`)](file:///Users/charles/Documents/AI/Python/llmqwen/docs/OPS_MANUAL.md)：涵盖 Conda 环境部署、端口自愈、全链路 `/metrics` 监控、launchd 后台常驻守护与常见故障排查。
 
 ---
 
