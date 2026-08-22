@@ -1,10 +1,27 @@
-# 将本地 Qwen 模型导入 Ollama 使用指南
-
-Ollama 底层基于 **`llama.cpp`** 运行时，核心使用 **GGUF 格式**。如果您希望在 Ollama 软件（或配合 Open WebUI、Page Assist 等）中使用本地下载的 Qwen 权重，请按照以下标准步骤进行转换与导入。
+# 将本地 Qwen 模型导入 Ollama 使用指南与生态原理解析
 
 ---
 
-## 🧭 整体流程概览
+## ❓ 核心问题：Ollama 支持 MLX 格式吗？
+
+**不支持。** Ollama **无法直接加载或运行 MLX 格式**的模型。
+
+### 为什么 Ollama 不支持 MLX？
+
+| 维度 | Ollama 生态 | Apple MLX 生态 (本项目) |
+| :--- | :--- | :--- |
+| **底层推理引擎** | 基于 **`llama.cpp`** (C/C++ 跨平台框架) | 基于 Apple 官方 **`MLX`** (针对 Apple Silicon 原生定制) |
+| **依赖的模型格式** | 强制使用 **GGUF 格式** (`.gguf` 单文件) | 使用 **Safetensors + JSON** (`model.safetensors`, `config.json`) |
+| **硬件优化深度** | 跨平台 Metal/CUDA 缓冲区抽象映射 | **Apple 统一内存零拷贝 (Zero-Copy UMA)**，Metal 内核深度融合 |
+| **投机加速支持** | 基础 Draft 模型机制 | **原生 MTP (Multi-Token Prediction) 投机前瞻加速** |
+
+> **💡 关键结论**：  
+> - 如果你想在 **Ollama** 中运行本地模型，**必须先将 Safetensors 模型转换为 GGUF 格式**。
+> - 如果你的目的是在 **WebUI（如 Open WebUI、Chatbox）、VS Code (Continue)、Cursor** 等软件中使用该模型，**完全不需要经过 Ollama 转换**！只需直接将客户端的 API Base URL 指向本项目的 `http://localhost:8000/v1`，即可同时享受 **MLX 极致性能 (55+ tok/s)** 与 **OpenAI 兼容生态**。
+
+---
+
+## 🧭 将本地 Safetensors 转换为 GGUF 并导入 Ollama 的流程
 
 ```
 本地已下载 Safetensors 权重 (~/.cache/modelscope/)
@@ -31,10 +48,8 @@ conda activate llmqwen
 
 # 安装 GGUF 转换依赖
 pip install gguf numpy sentencepiece protobuf
-```
 
-下载 `llama.cpp` 的轻量转换脚本：
-```bash
+# 下载 llama.cpp 转换工具
 git clone --depth 1 https://github.com/ggerganov/llama.cpp.git /tmp/llama.cpp
 ```
 
@@ -118,21 +133,14 @@ ollama run qwen3.8-27b-local
 
 ---
 
-## 🔌 在 IDE 或 WebUI 中使用 Ollama
+## 🔌 在前端工具（Chatbox / Open WebUI / Continue）中直连 MLX 的最佳方案
 
-- **Ollama API 地址**：`http://localhost:11434/v1`
-- **模型名称**：`qwen3.8-27b-local`
-- **兼容性**：支持 VS Code (Continue 插件选择 Provider 为 `ollama`)、Cursor、Open WebUI 等。
+如果您使用 Ollama 只是为了对接第三方客户端或前端界面，**完全不需要进行 GGUF 格式转换**：
 
----
+本项目提供的 AI Code Service 服务已经**原生提供了 100% 兼容 OpenAI 的 API 接口**：
 
-## ⚖️ MLX (当前 AI Code Service) 与 Ollama 的对比
+- **API Base URL**: `http://localhost:8000/v1`
+- **API Key**: 填 `dummy`（或任意字符串）
+- **Model Name**: `qwen3.8-27b-8bit-mtp`
 
-| 对比维度 | Apple MLX 原生服务 (本项目当前架构) | Ollama (llama.cpp GGUF 架构) |
-| :--- | :--- | :--- |
-| **底层核心** | Apple 官方原生 **MLX 框架** | **llama.cpp (C++ / Metal)** |
-| **显存机制** | **统一内存零拷贝** (Zero-Copy UMA) | 统一内存 Metal 缓冲区映射 |
-| **MTP 投机采样**| **原生支持 (45~65+ tok/s 极速)** | 需要配置双模型 Draft 运行 |
-| **KV Cache 显存量化**| **原生 8-bit KV Cache 量化 (节约 50% 显存)** | 支持 `--flash-attn` 与量化 KV |
-| **代码专有接口** | **自带 /v1/code/* 专有快捷重构/审查工具** | 仅标准 Chat / Generate 接口 |
-| **推荐适用场景** | **专业编程助手、IDE 深度结对编程、长代码库分析** | **跨平台部署、通用对话、WebUI 图形界面** |
+在此模式下，您可以直接在 **Chatbox**、**Open WebUI**、**NextChat**、**VS Code (Continue / Cline)**、**Cursor** 中获得比 Ollama 快 **30% ~ 50%** 的 MLX 原生硬件加速生成体验！
