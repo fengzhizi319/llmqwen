@@ -22,19 +22,25 @@ def get_models_to_link() -> List[Tuple[str, str, str]]:
     project_root = os.path.dirname(os.path.abspath(__file__))
     
     models = [
-        # 1. 本项目 8bit + MTP 综合版模型
+        # 1. 本项目 4bit MLX 原生极速量化版模型
+        (
+            os.path.join(project_root, "models", "qwen3.8-27b-mlx-4bit"),
+            "local",
+            "qwen3.8-27b-mlx-4bit",
+        ),
+        # 2. 本项目 8bit + MTP 综合版模型
         (
             os.path.join(project_root, "models", "qwen3.8-27b-8bit-mtp"),
             "local",
             "qwen3.8-27b-8bit-mtp",
         ),
-        # 2. ModelScope 下载的 8bit 独立量化版模型
+        # 3. ModelScope 下载的 8bit 独立量化版模型
         (
             "lmstudio-community/Qwen3.8-27B-MLX-8bit",
             "lmstudio-community",
             "Qwen3.8-27B-MLX-8bit",
         ),
-        # 3. ModelScope 下载的 27B 原始全精度模型
+        # 4. ModelScope 下载的 27B 原始全精度模型
         (
             "Qwen/Qwen3.8-27B",
             "Qwen",

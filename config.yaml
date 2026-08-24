@@ -8,7 +8,7 @@ server:
     - "*"
   # api_key: "sk-aicodeservice-secret"  # 可选：设置 API Key 鉴权
 
-# 深度性能优化与显存调优 (针对 128G 统一内存 Mac 调优)
+# 深度性能优化与显存调优 (针对 Apple Silicon 统一内存调优)
 performance:
   enable_cache: true               # 启用响应与 Prompt LRU 缓存（高频重复代码查询命中返回 <1ms）
   cache_max_size: 1024              # 缓存最大条目数
@@ -22,8 +22,8 @@ performance:
   prefill_step_size: 2048           # 🚀 分块预填充 (Chunked Prefill, 压低 256K 超大代码上下文峰值显存)
   enable_prompt_cache: true         # 🚀 提示词/系统前缀 KV Cache 显存复用 (<5ms 首字秒出)
 
-# 默认模型：8bit + MTP 完整综合加速版
-default_model: "qwen3.8-27b-8bit-mtp"
+# 默认模型：4bit MLX 原生极速版
+default_model: "qwen3.8-27b-4bit-custom"
 
 # 是否在未加载模型权重时全局使用 Mock 模式（用于测试/无GPU环境）
 use_mock: false
@@ -44,6 +44,12 @@ system_prompt: |
 
 # 模型配置 (全部支持 256K 超长上下文: 262,144 Tokens)
 models:
+  qwen3.8-27b-4bit-custom:
+    path: "./models/qwen3.8-27b-mlx-4bit"
+    description: "Qwen3.8-27B 本地定制 MLX 4bit 量化加速版 (支持 256K 上下文)"
+    engine_type: "mlx_vlm"
+    context_length: 262144
+
   qwen3.8-27b-8bit-mtp:
     path: "./models/qwen3.8-27b-8bit-mtp"
     description: "Qwen3.8-27B MLX 8bit + MTP 完整综合加速版 (支持 256K 上下文)"
