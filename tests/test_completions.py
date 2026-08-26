@@ -2,9 +2,12 @@
 Code Completions & FIM API 测试套件
 """
 
+from tests.conftest import TEST_MODEL_NAME
+
+
 def test_code_completions_basic(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "prompt": "def add(a, b):\n   ",
         "max_tokens": 50,
     }
@@ -19,7 +22,7 @@ def test_code_completions_basic(client):
 
 def test_code_completions_fim_fill_middle(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "prompt": "def calculate_total(a, b):\n   ",
         "suffix": "\n    return result",
         "max_tokens": 50,
@@ -36,7 +39,7 @@ def test_code_completions_fim_fill_middle(client):
 
 def test_code_completions_stream(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "prompt": "class DatabaseConnection:",
         "stream": True,
     }
@@ -48,7 +51,7 @@ def test_code_completions_stream(client):
 
 def test_code_completions_with_seed(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "prompt": "def hello():",
         "seed": 123,
         "max_tokens": 30,

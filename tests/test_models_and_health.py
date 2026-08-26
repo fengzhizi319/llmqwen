@@ -2,6 +2,9 @@
 模型管理、健康检查与元数据 API 测试套件
 """
 
+from tests.conftest import TEST_MODEL_NAME
+
+
 def test_root_endpoint(client):
     response = client.get("/")
     assert response.status_code == 200
@@ -40,8 +43,8 @@ def test_models_list_endpoint(client):
 
 
 def test_get_single_model_endpoint(client):
-    response = client.get("/v1/models/qwen3.8-27b")
+    response = client.get(f"/v1/models/{TEST_MODEL_NAME}")
     assert response.status_code == 200
     data = response.json()
-    assert data["id"] == "qwen3.8-27b"
+    assert data["id"] == TEST_MODEL_NAME
     assert data["object"] == "model"

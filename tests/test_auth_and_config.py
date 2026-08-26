@@ -2,10 +2,13 @@
 配置与 API Key 鉴权测试套件
 """
 
+from tests.conftest import TEST_MODEL_NAME
+
+
 def test_unauthorized_access(auth_client):
     # 未带 Bearer Token 访问受保护的 chat completion
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [{"role": "user", "content": "hello"}],
     }
     res = auth_client.post("/v1/chat/completions", json=payload)
@@ -16,7 +19,7 @@ def test_unauthorized_access(auth_client):
 def test_invalid_bearer_token(auth_client):
     headers = {"Authorization": "Bearer wrong-key"}
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [{"role": "user", "content": "hello"}],
     }
     res = auth_client.post("/v1/chat/completions", json=payload, headers=headers)
@@ -27,7 +30,7 @@ def test_invalid_bearer_token(auth_client):
 def test_valid_bearer_token(auth_client):
     headers = {"Authorization": "Bearer test-secret-key"}
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [{"role": "user", "content": "hello"}],
     }
     res = auth_client.post("/v1/chat/completions", json=payload, headers=headers)

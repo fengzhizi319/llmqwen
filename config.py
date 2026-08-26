@@ -41,7 +41,7 @@ class ModelSpec(BaseModel):
 class AppConfig(BaseModel):
     server: ServerConfig = Field(default_factory=ServerConfig)
     performance: PerformanceConfig = Field(default_factory=PerformanceConfig)
-    default_model: str = "qwen3.8-27b-8bit-mtp"
+    default_model: str = "qwen3.8-27b-oq4e-fp16-mtp"
     use_mock: bool = False
     system_prompt: str = """你是一个专业的编程助手。你的职责是：
 1. 帮助开发者编写、调试和优化代码
@@ -89,7 +89,7 @@ def load_config(config_path: str = "config.yaml") -> AppConfig:
     return AppConfig(
         server=ServerConfig(**server_data),
         performance=PerformanceConfig(**perf_data),
-        default_model=config_dict.get("default_model", os.getenv("DEFAULT_MODEL", "qwen3.8-27b-8bit-mtp")),
+        default_model=config_dict.get("default_model", os.getenv("DEFAULT_MODEL", "qwen3.8-27b-oq4e-fp16-mtp")),
         use_mock=config_dict.get("use_mock", os.getenv("USE_MOCK", "").lower() in ("true", "1")),
         system_prompt=config_dict.get("system_prompt", AppConfig().system_prompt),
         models=parsed_models,

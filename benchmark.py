@@ -58,7 +58,7 @@ def get_available_models() -> List[str]:
             return [m["id"] for m in data.get("data", [])]
     except Exception:
         pass
-    return ["qwen3.8-27b-8bit-mtp"]
+    return []
 
 
 def get_server_metrics() -> Dict[str, Any]:
@@ -234,8 +234,22 @@ def main():
         sys.exit(1)
 
     models_to_test = args.models or get_available_models()
-    # 过滤掉仅为辅助层的模型（如单独的 238MB MTP 层不能单独对话）
-    models_to_test = [m for m in models_to_test if m != "qwen3.8-27b-mlx"]
+    if not models_to_test:
+        print("❌ 错误: 未找到任何可用模型，请检查服务配置")
+        sys.exit(1)
+
+    # 过滤掉不能独立对话的辅助层模型（如单独的 MTP 层）
+    try:
+        resp = httpx.get(f"{BASE_URL}/v1/models", timeout=10.0)
+        if resp.status_code == 200:
+            model_info_map = {m["id"]: m.get("description", "") for m in resp.json().get("data", [])}
+            models_to_test = [
+                m for m in models_to_test
+                if "辅助层" not in model_info_map.get(m, "")
+            ]
+    except Exception:
+        # 如果无法获取描述信息，则不过滤
+        pass
 
     results = run_benchmark(models_to_test, rounds=args.rounds)
     print_comparison_table(results)

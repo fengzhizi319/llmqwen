@@ -10,6 +10,20 @@ import httpx
 BASE_URL = "http://localhost:1235"
 TIMEOUT = 120.0  # 大模型生成超时时间
 
+# 全局默认模型名称，启动时从服务动态获取
+DEFAULT_MODEL = ""
+
+
+def get_default_model() -> str:
+    """从服务健康检查接口动态获取默认模型名称"""
+    try:
+        resp = httpx.get(f"{BASE_URL}/health", timeout=10.0)
+        if resp.status_code == 200:
+            return resp.json().get("default_model", "")
+    except Exception:
+        pass
+    return ""
+
 
 def _stream_print(url: str, payload: dict, label: str):
     """统一流式请求与打字机输出打印"""
@@ -54,11 +68,11 @@ def test_models():
 
 
 def test_chat_completion():
-    print("\n--- [3] 对话补全 (/v1/chat/completions - Non-Stream) ---")
+    print(f"\n--- [3] 对话补全 (/v1/chat/completions - Non-Stream) [模型: {DEFAULT_MODEL}] ---")
     print("⏳ 正在请求大模型生成...")
     t0 = time.time()
     payload = {
-        "model": "qwen3.8-27b",
+        "model": DEFAULT_MODEL,
         "messages": [
             {"role": "user", "content": "请用一句话解释 Python 单例模式"}
         ],
@@ -77,7 +91,7 @@ def test_chat_completion():
 
 def test_chat_stream():
     payload = {
-        "model": "qwen3.8-27b",
+        "model": DEFAULT_MODEL,
         "messages": [{"role": "user", "content": "输出数字 1 到 5"}],
         "max_tokens": 50,
     }
@@ -89,7 +103,7 @@ def test_code_fim_autocomplete():
     print("⏳ 正在请求 FIM 补全...")
     t0 = time.time()
     payload = {
-        "model": "qwen3.8-27b",
+        "model": DEFAULT_MODEL,
         "prompt": "def add(a: int, b: int) -> int:\n   ",
         "suffix": "\n    return result",
         "max_tokens": 50,
@@ -141,6 +155,13 @@ def test_code_docstring_stream():
 
 if __name__ == "__main__":
     try:
+        # 动态获取默认模型名称
+        DEFAULT_MODEL = get_default_model()
+        if not DEFAULT_MODEL:
+            print("❌ 无法获取默认模型名称，请确保服务已启动")
+            raise httpx.ConnectError("Cannot get default model")
+        print(f"📌 使用默认模型: {DEFAULT_MODEL}")
+
         test_health()
         test_models()
         test_chat_completion()

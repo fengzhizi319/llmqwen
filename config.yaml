@@ -22,8 +22,8 @@ performance:
   prefill_step_size: 2048           # 🚀 分块预填充 (Chunked Prefill, 压低 256K 超大代码上下文峰值显存)
   enable_prompt_cache: true         # 🚀 提示词/系统前缀 KV Cache 显存复用 (<5ms 首字秒出)
 
-# 默认模型：4bit MLX 原生极速版
-default_model: "qwen3.8-27b-4bit-custom"
+# 默认模型：本地 MLX oQ 混合精度模型
+default_model: "qwen3.8-27b-oq4e-fp16-mtp"
 
 # 是否在未加载模型权重时全局使用 Mock 模式（用于测试/无GPU环境）
 use_mock: false
@@ -44,6 +44,12 @@ system_prompt: |
 
 # 模型配置 (全部支持 256K 超长上下文: 262,144 Tokens)
 models:
+  qwen3.8-27b-oq4e-fp16-mtp:
+    path: "./models/Qwen3.8-27B-oQ4e-fp16-mtp"
+    description: "Qwen3.8-27B 本地 MLX oQ 混合精度 4bit VLM 模型 (支持 256K 上下文)"
+    engine_type: "mlx_vlm"
+    context_length: 262144
+
   qwen3.8-27b-4bit-custom:
     path: "./models/qwen3.8-27b-mlx-4bit"
     description: "Qwen3.8-27B 本地定制 MLX 4bit 量化加速版 (支持 256K 上下文)"

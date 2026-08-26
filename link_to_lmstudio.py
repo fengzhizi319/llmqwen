@@ -34,6 +34,12 @@ def get_models_to_link() -> List[Tuple[str, str, str]]:
             "local",
             "qwen3.8-27b-8bit-mtp",
         ),
+        # 2.5 本项目 oQ4e + fp16 MTP 极致量化版模型
+        (
+            os.path.join(project_root, "models", "Qwen3.8-27B-oQ4e-fp16-mtp"),
+            "local",
+            "Qwen3.8-27B-oQ4e-fp16-mtp",
+        ),
         # 3. ModelScope 下载的 8bit 独立量化版模型
         (
             "lmstudio-community/Qwen3.8-27B-MLX-8bit",

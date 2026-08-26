@@ -6,11 +6,12 @@ import pytest
 from fastapi.testclient import TestClient
 from app import create_app
 from config import AppConfig, ServerConfig, ModelSpec
+from tests.conftest import TEST_MODEL_NAME
 
 
 def test_chat_completions_non_stream(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [
             {"role": "user", "content": "请写一个 Python 快速排序函数"}
         ],
@@ -22,7 +23,7 @@ def test_chat_completions_non_stream(client):
     data = response.json()
 
     assert data["object"] == "chat.completion"
-    assert data["model"] == "qwen3.8-27b"
+    assert data["model"] == TEST_MODEL_NAME
     assert len(data["choices"]) == 1
     assert data["choices"][0]["message"]["role"] == "assistant"
     assert len(data["choices"][0]["message"]["content"]) > 0
@@ -33,7 +34,7 @@ def test_chat_completions_non_stream(client):
 
 def test_chat_completions_stream(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [
             {"role": "user", "content": "Hello AI Code Service"}
         ],
@@ -77,10 +78,10 @@ def small_context_client(monkeypatch):
     """上下文长度很小的配置，用于测试 prompt 超限"""
     cfg = AppConfig(
         server=ServerConfig(host="127.0.0.1", port=1235),
-        default_model="qwen3.8-27b",
+        default_model=TEST_MODEL_NAME,
         use_mock=True,
         models={
-            "qwen3.8-27b": ModelSpec(
+            TEST_MODEL_NAME: ModelSpec(
                 path="Qwen/Qwen3.8-27B",
                 description="Mock small ctx",
                 context_length=10,
@@ -95,7 +96,7 @@ def small_context_client(monkeypatch):
 
 def test_chat_completions_with_seed(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [{"role": "user", "content": "Hello"}],
         "seed": 42,
         "max_tokens": 20,
@@ -109,7 +110,7 @@ def test_chat_completions_with_seed(client):
 
 def test_chat_prompt_too_long(small_context_client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [{"role": "user", "content": "a" * 100}],
         "max_tokens": 10,
     }
@@ -122,7 +123,7 @@ def test_chat_prompt_too_long(small_context_client):
 def test_responses_endpoint_compatibility(client):
     """测试 OpenAI Responses API (/v1/responses) 兼容端点"""
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "input": "请解释 Python 列表推导式",
         "instructions": "你是一个精通 Python 的助手",
         "max_output_tokens": 50,

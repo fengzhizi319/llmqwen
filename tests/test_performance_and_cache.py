@@ -9,6 +9,7 @@ import pytest
 from engine.cache import ResponseCache
 from engine.mock_engine import MockModelEngine
 from schemas import ChatCompletionRequest, ChatMessage, CompletionRequest
+from tests.conftest import TEST_MODEL_NAME
 
 
 def test_response_cache_basic_operations():
@@ -52,7 +53,7 @@ def test_response_cache_ttl_expiry():
 
 def test_api_cache_headers_and_subsequent_hits(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "messages": [{"role": "user", "content": "Explain binary search"}],
         "temperature": 0.0,
     }
@@ -73,7 +74,7 @@ def test_api_cache_headers_and_subsequent_hits(client):
 
 def test_completions_cache_headers(client):
     payload = {
-        "model": "qwen3.8-27b",
+        "model": TEST_MODEL_NAME,
         "prompt": "def add(a, b):\n   ",
         "suffix": "\n    return res",
     }
