@@ -46,8 +46,8 @@ system_prompt: |
 models:
   qwen3.8-27b-oq4e-fp16-mtp:
     path: "./models/Qwen3.8-27B-oQ4e-fp16-mtp"
-    description: "Qwen3.8-27B 本地 MLX oQ 混合精度 4bit VLM 模型 (支持 256K 上下文)"
-    engine_type: "mlx_vlm"
+    description: "Qwen3.8-27B 本地 MLX oQ 混合精度 4bit 模型 + MTP 推测解码 (支持 256K 上下文)"
+    engine_type: "mlx_lm"
     context_length: 262144
 
   qwen3.8-27b-4bit-custom:
@@ -74,8 +74,3 @@ models:
     engine_type: "mlx_vlm"
     context_length: 262144
 
-  qwen3.8-27b:
-    path: "Qwen/Qwen3.8-27B"
-    description: "Qwen3.8-27B 原始标准版本 (16bit 全精度，54GB 权重)"
-    engine_type: "auto"
-    context_length: 262144

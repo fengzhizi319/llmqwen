@@ -115,7 +115,9 @@ async def create_chat_completion(
                         seed=req.seed,
                         chunk_size=stream_chunk_size,
                     )
+                    full_output_text = ""
                     async for chunk_text in tokens_gen:
+                        full_output_text += chunk_text
                         chunk_payload = {
                             "id": request_id,
                             "object": "chat.completion.chunk",
@@ -131,7 +133,10 @@ async def create_chat_completion(
                         }
                         yield f"data: {json.dumps(chunk_payload, ensure_ascii=False)}\n\n"
 
-                # 结束 Chunk
+                # 计算实际生成 token 数
+                completion_tokens = engine.count_tokens(full_output_text)
+
+                # 结束 Chunk (附带 usage 统计供客户端精确计算 TPS)
                 done_payload = {
                     "id": request_id,
                     "object": "chat.completion.chunk",
@@ -144,6 +149,11 @@ async def create_chat_completion(
                             "finish_reason": "stop",
                         }
                     ],
+                    "usage": {
+                        "prompt_tokens": prompt_tokens,
+                        "completion_tokens": completion_tokens,
+                        "total_tokens": prompt_tokens + completion_tokens,
+                    },
                 }
                 yield f"data: {json.dumps(done_payload, ensure_ascii=False)}\n\n"
                 yield "data: [DONE]\n\n"

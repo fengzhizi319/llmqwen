@@ -120,6 +120,10 @@ class BaseModelEngine(ABC):
         """检查引擎可用性"""
         return True
 
+    def unload_model(self) -> None:
+        """释放模型权重与显存，子类可覆写实现真正的资源回收"""
+        pass
+
     def get_stats(self) -> Dict[str, Any]:
         """获取引擎运行指标"""
         return {}

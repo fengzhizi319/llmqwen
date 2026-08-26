@@ -152,3 +152,11 @@ class ModelManager:
             if hasattr(engine, "get_stats"):
                 report["engines"][name] = engine.get_stats()
         return report
+
+    def unload_engine(self, model_name: str) -> bool:
+        """卸载指定模型的引擎，释放模型权重与显存"""
+        engine = self.engines.pop(model_name, None)
+        if engine is None:
+            return False
+        engine.unload_model()
+        return True

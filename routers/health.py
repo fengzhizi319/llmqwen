@@ -5,7 +5,7 @@ AI Code Service - 健康检查与服务度量路由
 
 import time
 from typing import Dict, Any
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from engine import ModelManager
 
 router = APIRouter(tags=["Health & Status"])
@@ -72,3 +72,14 @@ async def get_metrics(manager: ModelManager = Depends(get_model_manager)):
             "max_concurrency": manager.config.performance.max_concurrency,
         },
     }
+
+
+@router.post("/admin/unload/{model_name:path}")
+async def unload_model(model_name: str, manager: ModelManager = Depends(get_model_manager)):
+    """卸载指定模型，释放权重与显存（用于基准测试等场景）"""
+    if model_name not in manager.engines:
+        raise HTTPException(status_code=404, detail=f"Model '{model_name}' is not loaded")
+    success = manager.unload_engine(model_name)
+    if success:
+        return {"status": "ok", "message": f"Model '{model_name}' unloaded successfully"}
+    raise HTTPException(status_code=500, detail=f"Failed to unload model '{model_name}'")
