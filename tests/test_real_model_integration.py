@@ -186,12 +186,13 @@ def real_manager(real_engine):
 # 1. Engine 层 — 直接调用引擎 generate / stream_generate
 # ===========================================================================
 
-
+# RUN_REAL_MODEL_TESTS=1 python -m pytest tests/test_real_model_integration.py::test_engine_chat -v -s
 def test_engine_chat(real_engine):
     """引擎层: 基础对话 — 模型能生成有意义的非空回答。"""
     prompt = "<|im_start|>user\n用一句话解释什么是递归。<|im_end|>\n<|im_start|>assistant\n"
     result = real_engine.generate(prompt, max_tokens=256, temperature=0.0, top_p=0.9)
     answer = _strip_thinking(result)
+    print(answer)
 
     assert answer.strip(), "模型回答不应为空"
     assert real_engine.count_tokens(answer) > 0

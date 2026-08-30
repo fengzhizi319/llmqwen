@@ -50,6 +50,13 @@ venv.bak/
 # macOS
 .DS_Store
 
+# Go binary
+webapp/webapp-gateway
+
+# Vite / Node
+webapp/frontend/node_modules/
+webapp/dist/
+
 # Large model weights and checkpoints (downloaded locally)
 models/
 checkpoints/

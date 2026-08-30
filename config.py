@@ -1,11 +1,19 @@
 """
 AI Code Service - 配置加载与管理模块
+
+配置优先级: 系统环境变量 > .env 文件 > config.yaml > 代码默认值
 """
 
 import os
+from pathlib import Path
 from typing import Dict, List, Optional
+
 import yaml
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+
+# 自动加载项目根目录的 .env 文件 (override=False 保留系统环境变量)
+load_dotenv(Path(__file__).resolve().parent / ".env", override=False)
 
 
 class ServerConfig(BaseModel):

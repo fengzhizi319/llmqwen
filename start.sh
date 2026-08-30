@@ -9,6 +9,15 @@ echo "  🚀 AI Code Service"
 echo "=========================================="
 
 ENV_NAME="llmqwen"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 0. 加载 .env 环境变量配置 (不覆盖已有系统环境变量)
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    echo "📄 加载 .env 配置..."
+    set -a
+    . "$SCRIPT_DIR/.env"
+    set +a
+fi
 
 # 1. 尝试自动激活 Conda 环境
 if [ "$CONDA_DEFAULT_ENV" != "$ENV_NAME" ]; then
