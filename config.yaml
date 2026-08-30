@@ -22,8 +22,8 @@ performance:
   prefill_step_size: 2048           # 🚀 分块预填充 (Chunked Prefill, 压低 256K 超大代码上下文峰值显存)
   enable_prompt_cache: true         # 🚀 提示词/系统前缀 KV Cache 显存复用 (<5ms 首字秒出)
 
-# 默认模型：本地 MLX oQ 混合精度模型
-default_model: "qwen3.8-27b-oq4e-fp16-mtp"
+# 默认模型：Qwen3.8 Flash Next oQ4e MTP 128K
+default_model: "qwen3.8-flash-next-oq4e-mtp-128k"
 
 # 是否在未加载模型权重时全局使用 Mock 模式（用于测试/无GPU环境）
 use_mock: false
@@ -42,8 +42,14 @@ system_prompt: |
   - 解释要清晰简洁，遵循行业最佳实践。
   - 如果用户未提供具体代码片段，请直接引导用户提供目标代码或在编辑器中选中代码。
 
-# 模型配置 (全部支持 256K 超长上下文: 262,144 Tokens)
+# 模型配置 (支持多架构: qwen4_exp / qwen3_5 / qwen3_moe 等)
 models:
+  qwen3.8-flash-next-oq4e-mtp-128k:
+    path: "jedisct1/Qwen3.8-Flash-Next-oQ4e-MTP-128k"
+    description: "Qwen3.8 Flash Next oQ4e MTP 128K (Qwen4Exp 架构，内置 MoE MTP，支持 128K 上下文)"
+    engine_type: "qwen4_exp"
+    context_length: 131072
+
   qwen3.8-27b-oq4e-fp16-mtp:
     path: "./models/Qwen3.8-27B-oQ4e-fp16-mtp"
     description: "Qwen3.8-27B 本地 MLX oQ 混合精度 4bit 模型 + MTP 推测解码 (支持 256K 上下文)"

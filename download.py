@@ -10,9 +10,10 @@ from modelscope import snapshot_download
 
 
 MODEL_REGISTRY = {
-    "qwen3.8-27b-mlx": "inferencerlabs/Qwen3.8-27B-MTP-MLX",
-    "qwen3.8-27b-8bit": "lmstudio-community/Qwen3.8-27B-MLX-8bit",
-    "qwen3.8-27b": "Qwen/Qwen3.8-27B",
+    "qwen3.8-flash-next-oQ4e-mtp-128k": "jedisct1/Qwen3.8-Flash-Next-oQ4e-MTP-128k",
+    # "qwen3.8-27b-mlx": "inferencerlabs/Qwen3.8-27B-MTP-MLX",
+    # "qwen3.8-27b-8bit": "lmstudio-community/Qwen3.8-27B-MLX-8bit",
+    # "qwen3.8-27b": "Qwen/Qwen3.8-27B",
 }
 
 

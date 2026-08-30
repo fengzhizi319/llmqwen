@@ -1,0 +1,30 @@
+{
+  "qwen3.8-27b-oq4e-fp16-mtp": {
+    "scenarios": {
+      "⚡ 短文本对话 (Short Prompt)": {
+        "avg_ttft_ms": 883.2,
+        "avg_generation_tps": 47.14,
+        "avg_total_time_s": 1.49,
+        "sample": "# du林独, スポンサーサイト</ ExpandEMPLSystem pi更多内容IW JUG `< Pi[\" sup..."
+      },
+      "🛠️ 代码重构 (Medium Code Refactor)": {
+        "avg_ttft_ms": 1114.5,
+        "avg_generation_tps": 44.75,
+        "avg_total_time_s": 2.37,
+        "sample": "_没 Han可SX1KI2_uri0 Brelated+Gs</ field 0 most negid未 * turn在..."
+      },
+      "📜 长文本理解 (Long Context Prefill)": {
+        "avg_ttft_ms": 4800.7,
+        "avg_generation_tps": 42.36,
+        "avg_total_time_s": 5.64,
+        "sample": "</1状态/_k_ _天马吻e (o,jo  坚持(\";有_ b  -#<|quad_start|>*� :�-LI  ..."
+      }
+    },
+    "summary": {
+      "avg_overall_tps": 44.75,
+      "avg_overall_ttft_ms": 2266.1,
+      "active_memory_mb": "N/A",
+      "peak_memory_mb": "N/A"
+    }
+  }
+}

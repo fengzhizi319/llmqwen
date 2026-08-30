@@ -40,6 +40,12 @@ def get_models_to_link() -> List[Tuple[str, str, str]]:
             "local",
             "Qwen3.8-27B-oQ4e-fp16-mtp",
         ),
+        # 2.6 ModelScope 下载的 oQ4e + MTP 128k 版模型
+        (
+            "jedisct1/Qwen3.8-Flash-Next-oQ4e-MTP-128k",
+            "jedisct1",
+            "Qwen3.8-Flash-Next-oQ4e-MTP-128k",
+        ),
         # 3. ModelScope 下载的 8bit 独立量化版模型
         (
             "lmstudio-community/Qwen3.8-27B-MLX-8bit",

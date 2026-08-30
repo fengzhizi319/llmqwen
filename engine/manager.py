@@ -12,6 +12,7 @@ from config import AppConfig, ModelSpec
 from .base import BaseModelEngine
 from .mock_engine import MockModelEngine
 from .mlx_engine import MLXModelEngine
+from .qwen4_exp_engine import Qwen4ExpEngine
 from .cache import ResponseCache
 
 
@@ -89,17 +90,31 @@ class ModelManager:
         enable_prompt_cache = perf.enable_prompt_cache if perf else True
 
         try:
-            engine = MLXModelEngine(
-                model_name=target_name,
-                model_path=spec.path,
-                engine_type=spec.engine_type,
-                metal_cache_limit_mb=metal_limit,
-                clear_cache_after_generation=clear_cache,
-                kv_bits=kv_bits,
-                kv_group_size=kv_group_size,
-                prefill_step_size=prefill_step,
-                enable_prompt_cache=enable_prompt_cache,
-            )
+            # 根据 engine_type 选择引擎实现
+            # qwen4_exp 架构使用专用引擎，其他架构使用通用 MLX 引擎
+            if spec.engine_type == "qwen4_exp":
+                engine = Qwen4ExpEngine(
+                    model_name=target_name,
+                    model_path=spec.path,
+                    metal_cache_limit_mb=metal_limit,
+                    clear_cache_after_generation=clear_cache,
+                    kv_bits=kv_bits,
+                    kv_group_size=kv_group_size,
+                    prefill_step_size=prefill_step,
+                    enable_prompt_cache=enable_prompt_cache,
+                )
+            else:
+                engine = MLXModelEngine(
+                    model_name=target_name,
+                    model_path=spec.path,
+                    engine_type=spec.engine_type,
+                    metal_cache_limit_mb=metal_limit,
+                    clear_cache_after_generation=clear_cache,
+                    kv_bits=kv_bits,
+                    kv_group_size=kv_group_size,
+                    prefill_step_size=prefill_step,
+                    enable_prompt_cache=enable_prompt_cache,
+                )
             self.engines[target_name] = engine
             return engine
         except Exception as e:

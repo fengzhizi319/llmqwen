@@ -15,7 +15,7 @@ from config import ModelSpec, load_config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config.yaml"
-VALID_ENGINE_TYPES = {"auto", "mlx_lm", "mlx_vlm", "mock"}
+VALID_ENGINE_TYPES = {"auto", "mlx_lm", "mlx_vlm", "qwen4_exp", "mock"}
 
 
 @pytest.fixture(scope="module")

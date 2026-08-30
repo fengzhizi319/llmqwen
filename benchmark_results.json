@@ -1,0 +1,30 @@
+{
+  "qwen3.8-27b-4bit-custom": {
+    "scenarios": {
+      "⚡ 短文本对话 (Short Prompt)": {
+        "avg_ttft_ms": 2502.4,
+        "avg_generation_tps": 5.18,
+        "avg_total_time_s": 3.27,
+        "sample": "<think> 用户要求用一句话解释 Python 字典的底层哈希表原理。需要简洁、准确、一句话概括。  Python ..."
+      },
+      "🛠️ 代码重构 (Medium Code Refactor)": {
+        "avg_ttft_ms": 1183.4,
+        "avg_generation_tps": 7.07,
+        "avg_total_time_s": 3.02,
+        "sample": "<think> 用户要求重构一段 Python 代码，需要： 1. 添加异常处理 2. 添加类型注解 3. 重构代码使其..."
+      },
+      "📜 长文本理解 (Long Context Prefill)": {
+        "avg_ttft_ms": 5816.0,
+        "avg_generation_tps": 0.0,
+        "avg_total_time_s": 5.82,
+        "sample": "<think> 用户提供了一个后端系统的模块逻辑定义，虽然注释重复了很多次，但核心信息是明确的：这是一个包含**数据清洗..."
+      }
+    },
+    "summary": {
+      "avg_overall_tps": 4.08,
+      "avg_overall_ttft_ms": 3167.3,
+      "active_memory_mb": "N/A",
+      "peak_memory_mb": "N/A"
+    }
+  }
+}
