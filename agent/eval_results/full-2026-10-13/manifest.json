@@ -1,0 +1,27 @@
+{
+  "started_utc": "2026-10-13T15:00:33.179853+00:00",
+  "settings": {
+    "dataset": "all",
+    "base_url": "http://127.0.0.1:1247/v1",
+    "model": "qwen3.8-flash-next-oq4e-mtp-128k",
+    "mbpp_tier_size": 0,
+    "limit": 0,
+    "only": null,
+    "timeout": 300,
+    "test_timeout": 15,
+    "temperature": 0.0,
+    "max_tokens": 2048,
+    "output_dir": "/Users/charles/Documents/AI/Python/llmqwen/agent/eval_results/full-2026-10-13",
+    "request_retries": 1
+  },
+  "python": "3.13.15 | packaged by conda-forge | (main, Aug 10 2026, 13:01:04) [Clang 19.1.7 ]",
+  "datasets_sha256": {
+    "HumanEval.jsonl": "1d49078ba3e2b196b9344535bef34a43021f038fad9561d6ee7c53450609a6a2",
+    "mbpp.jsonl": "ccf64ceae9c5403bf50a044cb6d505bfd2a2963ee58338ba268fd65beab92a9f"
+  },
+  "versions": {
+    "mlx": "0.32.1",
+    "mlx-lm": "0.31.3",
+    "transformers": "5.15.1"
+  }
+}

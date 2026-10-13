@@ -39,7 +39,7 @@ pip install -r requirements.txt
 ## 2. 服务生命周期管理与启停
 
 ### 2.1 推荐启动方式 (`start.sh`)
-项目根目录下的 [`start.sh`](file:///Users/charles/Documents/AI/Python/llmqwen/start.sh) 已经内置了环境自愈、端口占用清理与版本锁定机制：
+项目根目录下的 [`start.sh`](../start.sh) 已经内置了环境自愈、端口占用清理与版本锁定机制：
 
 ```bash
 # 启动 API 服务（默认监听 0.0.0.0:1235）
@@ -124,11 +124,11 @@ python convert_to_mlx.py --bits 4 --output ./models/qwen3.8-27b-mlx-4bit
 | 指标字段 | 类型 | 单位 | 运维说明与健康阈值 |
 | :--- | :--- | :--- | :--- |
 | `active_memory_mb` | float | MB | Apple Metal 驱动当前活跃物理显存（正常范围：28,000MB ~ 70,000MB） |
-| `cache_memory_mb` | float | MB | Metal 驱动显存缓存池（由 `metal_cache_limit_mb` 限制，默认 4096MB） |
+| `cache_memory_mb` | float | MB | Metal 空闲内存池（由 `metal_cache_limit_mb` 限制，默认 8192 MiB） |
 | `peak_memory_mb` | float | MB | 历史峰值显存占用（128G 机器建议告警阈值 > 105,000MB） |
 | `last_prompt_tps` | float | Tokens/s | 最近一次请求的提示词预填充速度（Prefill TPS） |
 | `last_generation_tps` | float | Tokens/s | 最近一次请求的代码生成速度（8bit+MTP 正常值：45 ~ 65+ tok/s） |
-| `cache.hit_rate` | float | % | 响应/前缀缓存命中率（高频编程场景预期 > 35%） |
+| `cache.hit_rate` | float | % | 响应缓存命中率（0~1；前缀缓存见引擎 prefix_cache 指标） |
 | `cache.size` | int | 条目 | 当前内存中缓存的高频响应条数（最大 1024） |
 
 ---
@@ -210,3 +210,50 @@ tail -f /tmp/aicodeservice.stdout.log
 # 停止并卸载守护进程
 launchctl unload ~/Library/LaunchAgents/com.aicodeservice.server.plist
 ```
+
+## 7. Qwen4Exp 前缀缓存运维与真实加载验证
+
+### 7.1 使用已验证的专用运行环境
+
+2026-10-13 本机实际加载 `qwen3.8-flash-next-oq4e-mtp-128k` 成功。专用环境为 Python 3.13.15 / MLX 0.32.1 / mlx-lm 0.31.3 / transformers 5.14.1。base Python 3.10 存在 `mlx.core` 动态库符号缺失，不能用其加载成功与否判断模型资产是否损坏。
+
+```bash
+conda run -n llmqwen python -c 'import mlx.core; import mlx_lm; print("MLX imports OK")'
+RUN_REAL_MODEL_TESTS=1 conda run -n llmqwen python -m pytest \
+  tests/test_real_model_integration.py -q --capture=fd
+```
+
+默认 Qwen4Exp 模型活跃权重约 88 GiB，本次峰值活跃内存约 90 GiB。第 1 节 27B/8bit 的 28GB 权重预算不适用于此模型。没有进行 128K/256K 输入或多个大型模型同时加载的内存安全测试。
+
+### 7.2 配置与容量调整
+
+```yaml
+performance:
+  enable_prompt_cache: true
+  prompt_cache_max_entries: 4
+  prompt_cache_max_tokens: 8192
+  prefill_step_size: 2048
+```
+
+两个容量字段仅用于 Qwen4Exp，分别控制每个引擎的快照条目数和每条快照覆盖的 token 数。超出上限的输入正常继续预填充，不会因此缩短模型上下文。单请求可能保存两个或更多边界。内存紧张时先降低条目数/单快照长度；设置 `enable_prompt_cache: false` 可关闭复用，重启服务后不再保留快照。
+
+参数在引擎创建时读取，更改 YAML 后重启服务。卸载模型会清空快照。`clear_cache_after_generation` 清理的是空闲 Metal 内存池，不能释放仍被前缀快照持有的活跃数组。
+
+### 7.3 区分前缀命中与响应命中
+
+观察 `/metrics` 的 `performance.engines[模型名].prefix_cache`，包含 `entries`、`hits`、`misses`、`reused_tokens`、`state_bytes` 等。`last_reused_tokens` 说明最近一次跳过多少输入计算；`last_prefill_seconds` 只覆盖前缀恢复/预填充/快照保存，不能当作端到端首字延迟。
+
+`X-Cache: HIT` 和 `performance.cache` 属于响应缓存；工具请求不使用响应缓存，仍可命中混合状态前缀缓存。全局监控快照由缓存自己的短锁保护，不等待整个模型生成锁。
+
+### 7.4 复现与故障定位
+
+```bash
+conda run -n llmqwen python -u scripts/benchmark-prefix-cache.py \
+  --output docs/benchmarks/qwen4-prefix-cache-local.json
+```
+
+脚本实际加载权重，绕过响应缓存，比较重复、分支、多轮、改系统/缩短输入、取消恢复与贪婪 MTP。异常时仍保存已经完成的记录，失败输出会阻止“性能通过”判定。
+
+首轮构造快照可能变慢；首次 kernel warmup 必须单独记录。命中率低时检查工具声明和系统提示词是否每轮变化、token 前缀是否一致、LRU 是否已经淘汰快照。若怀疑 MTP 输出异常，可设 `enable_mtp: false` 做原生输出对比；本次实现只对贪婪采样采用投机验证。
+
+详细参数、状态安全性、指标释义和原始测量：[QWEN4_PREFIX_CACHE.md](QWEN4_PREFIX_CACHE.md)。

@@ -16,14 +16,18 @@
 """
 
 import argparse
+import hashlib
+import importlib.metadata
 import gzip
 import json
 import random
 import re
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -137,20 +141,22 @@ def call_chat(base_url: str, model: str, system: str, user: str, timeout: int, t
         # 随机 seed: 避免命中后端响应缓存，保证计时真实
         "seed": random.randint(1, 2**31 - 1),
         "stream": False,
+        "enable_thinking": False,
     }
     req = urllib.request.Request(
         base_url.rstrip("/") + "/chat/completions",
         data=json.dumps(body).encode(),
         headers={"Content-Type": "application/json"},
     )
-    t0 = time.time()
+    t0 = time.perf_counter()
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         data = json.load(resp)
-    elapsed = time.time() - t0
+    elapsed = time.perf_counter() - t0
     return {
         "text": data["choices"][0]["message"]["content"] or "",
         "elapsed": elapsed,
         "completion_tokens": data.get("usage", {}).get("completion_tokens", 0),
+        "finish_reason": data["choices"][0].get("finish_reason"),
     }
 
 
@@ -185,7 +191,8 @@ def run_test(module_code: str, task: dict, dataset: str, timeout: int) -> tuple[
         test_code = m["test_setup_code"] + "\n" + "\n".join(m["test_list"]) + "\nprint('ALL_PASS')\n"
     script = module_code + "\n" + test_code
     try:
-        r = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, timeout=timeout)
+        with tempfile.TemporaryDirectory(prefix="llmqwen-eval-") as workdir:
+            r = subprocess.run([sys.executable, "-I", "-c", script], capture_output=True, text=True, timeout=timeout, cwd=workdir)
         ok = r.returncode == 0 and "ALL_PASS" in r.stdout
         err = (r.stderr or r.stdout or "").strip()
         last = err.splitlines()[-1] if err else ""
@@ -197,18 +204,24 @@ def run_test(module_code: str, task: dict, dataset: str, timeout: int) -> tuple[
 def done_uids(path: Path) -> set[str]:
     if not path.exists():
         return set()
-    done = set()
+    latest = {}
     for line in path.read_text(encoding="utf-8").splitlines():
         try:
-            done.add(json.loads(line)["uid"])
+            record = json.loads(line)
+            latest[record["uid"]] = record
         except Exception:
             continue
-    return done
+    # An infrastructure failure is not a completed model sample. Code/test
+    # failures ARE completed samples and must never be resampled for pass@1.
+    return {uid for uid, record in latest.items()
+            if record.get("status") != "request_error"
+            and not record.get("err", "").startswith("request:")}
 
 
 def evaluate(dataset: str, tasks: list[dict], args) -> dict:
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = OUT_DIR / f"{dataset}.jsonl"
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_path = output_dir / f"{dataset}.jsonl"
     done = done_uids(out_path) if args.resume else set()
     if not done:
         out_path.write_text("", encoding="utf-8")
@@ -221,7 +234,14 @@ def evaluate(dataset: str, tasks: list[dict], args) -> dict:
         system, user = build_prompt(task, dataset)
         rec = {"uid": task["uid"], "tier": task["tier"], "entry_point": task["entry_point"]}
         try:
-            gen = call_chat(args.base_url, args.model, system, user, args.timeout, args.temperature, args.max_tokens)
+            for attempt in range(args.request_retries + 1):
+                try:
+                    gen = call_chat(args.base_url, args.model, system, user, args.timeout, args.temperature, args.max_tokens)
+                    break
+                except Exception:
+                    if attempt == args.request_retries:
+                        raise
+                    time.sleep(min(2 ** attempt, 10))
             code = assemble_humaneval(task, gen["text"]) if dataset == "humaneval" else assemble_mbpp(task, gen["text"])
             ok, err = run_test(code, task, dataset, args.test_timeout)
             rec.update({
@@ -230,16 +250,26 @@ def evaluate(dataset: str, tasks: list[dict], args) -> dict:
                 "completion_tokens": gen["completion_tokens"],
                 "tps": round(gen["completion_tokens"] / gen["elapsed"], 1) if gen["elapsed"] > 0.05 else 0.0,
                 "err": "" if ok else err,
+                "status": "passed" if ok else "test_timeout" if err == "timeout" else "test_failed",
+                "request_attempts": attempt + 1,
+                "model_output": gen["text"],
+                "code": code,
+                "finish_reason": gen["finish_reason"],
+                "output_tokens_at_limit": gen["completion_tokens"] >= args.max_tokens,
             })
             if args.dump_code and not ok:
                 rec["code"] = code
         except Exception as e:
-            rec.update({"pass": False, "err": f"request: {e.__class__.__name__}: {e}"})
+            rec.update({"pass": False, "status": "request_error", "err": f"request: {e.__class__.__name__}: {e}"})
+        rec["timestamp_utc"] = datetime.now(timezone.utc).isoformat()
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
         f.flush()
         mark = "PASS" if rec["pass"] else "FAIL"
         print(f"[{mark}] {task['uid']:18s} tier={task['tier']:10s} {rec.get('elapsed', 0):6.1f}s {rec.get('completion_tokens', 0):5d} tok  {rec.get('tps', 0):5.1f} tok/s" + ("" if rec["pass"] else f"  | {rec.get('err', '')[:80]}"), flush=True)
         n += 1
+        if rec["status"] == "request_error":
+            print("Infrastructure error: stopping so the backend can recover; resume will retry this task.", flush=True)
+            break
         if args.limit and n >= args.limit:
             break
     f.close()
@@ -249,7 +279,10 @@ def evaluate(dataset: str, tasks: list[dict], args) -> dict:
     latest: dict[str, dict] = {}
     for r in records:
         latest[r["uid"]] = r
-    records = list(latest.values())
+    expected_uids = {task["uid"] for task in tasks}
+    records = [r for uid, r in latest.items() if uid in expected_uids]
+    infrastructure_errors = sum(r.get("status") == "request_error" or r.get("err", "").startswith("request:") for r in records)
+    completed = len(records) - infrastructure_errors
 
     tiers: dict[str, dict] = {}
     for r in records:
@@ -271,12 +304,18 @@ def evaluate(dataset: str, tasks: list[dict], args) -> dict:
         "pass_at_1": round(passed / total, 4) if total else 0.0,
         "passed": passed,
         "total": total,
+        "expected_total": len(tasks),
+        "completed_generation_and_test": completed,
+        "infrastructure_errors": infrastructure_errors,
+        "missing": len(tasks) - total,
+        "complete": completed == len(tasks),
+        "test_timeouts": sum(r.get("status") == "test_timeout" for r in records),
         "avg_elapsed_s": round(elapsed / total, 2) if total else 0.0,
         "avg_tps": round(tokens / elapsed, 1) if elapsed else 0.0,
         "by_tier": tiers,
         "failures": [{"uid": r["uid"], "tier": r["tier"], "err": r.get("err", "")[:200]} for r in records if not r["pass"]],
     }
-    (OUT_DIR / f"{dataset}_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / f"{dataset}_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     return summary
 
 
@@ -300,7 +339,31 @@ def main() -> int:
     ap.add_argument("--max-tokens", type=int, default=2048)
     ap.add_argument("--resume", action="store_true", help="跳过结果文件中已完成的题目")
     ap.add_argument("--dump-code", action="store_true", help="失败时把生成代码写入结果记录")
+    ap.add_argument("--output-dir", type=Path, default=OUT_DIR, help="独立评测目录，避免覆盖历史结果")
+    ap.add_argument("--request-retries", type=int, default=2, help="只重试请求失败，不重采样测试失败")
     args = ap.parse_args()
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = args.output_dir / "manifest.json"
+    settings = {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()
+                if key not in {"resume", "dump_code"}}
+    if args.resume and manifest_path.exists():
+        previous = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if previous["settings"] != settings:
+            raise SystemExit("Cannot resume with different evaluation settings")
+    else:
+        manifest = {
+            "started_utc": datetime.now(timezone.utc).isoformat(),
+            "settings": settings, "python": sys.version,
+            "datasets_sha256": {name: hashlib.sha256((DATA_DIR / name).read_bytes()).hexdigest()
+                                for name in ["HumanEval.jsonl", "mbpp.jsonl"] if (DATA_DIR / name).exists()},
+            "versions": {},
+        }
+        for name in ["mlx", "mlx-lm", "transformers"]:
+            try:
+                manifest["versions"][name] = importlib.metadata.version(name)
+            except importlib.metadata.PackageNotFoundError:
+                pass
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     datasets = ["humaneval", "mbpp"] if args.dataset == "all" else [args.dataset]
     exit_code = 0
@@ -315,6 +378,8 @@ def main() -> int:
         print(f"===== {ds}: {len(tasks)} 题 =====", flush=True)
         summary = evaluate(ds, tasks, args)
         print_summary(summary)
+        if not summary["complete"]:
+            exit_code = 2
     return exit_code
 
 

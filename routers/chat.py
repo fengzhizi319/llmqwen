@@ -4,6 +4,7 @@ AI Code Service - Chat Completions & Responses API 路由
 """
 
 import json
+from contextlib import aclosing
 import time
 import uuid
 from typing import Dict, Any, List, Union
@@ -143,6 +144,7 @@ async def create_chat_completion(
         top_p=req.top_p,
         stop=req.stop,
         seed=req.seed,
+        max_tokens=max_toks,
     )
 
     stream_chunk_size = (
@@ -168,30 +170,31 @@ async def create_chat_completion(
                     full_output_text = ""
                     region_filter = tool_format.StreamRegionFilter() if use_tools else None
                     raw_output_text = ""
-                    async for chunk_text in tokens_gen:
-                        if region_filter is not None:
-                            raw_output_text += chunk_text
-                            visible = region_filter.feed(chunk_text)
-                            if not visible:
-                                continue
-                            full_output_text += visible
-                        else:
-                            visible = chunk_text
-                            full_output_text += visible
-                        chunk_payload = {
-                            "id": request_id,
-                            "object": "chat.completion.chunk",
-                            "created": created_time,
-                            "model": model_name,
-                            "choices": [
-                                {
-                                    "index": 0,
-                                    "delta": {"content": visible},
-                                    "finish_reason": None,
-                                }
-                            ],
-                        }
-                        yield f"data: {json.dumps(chunk_payload, ensure_ascii=False)}\n\n"
+                    async with aclosing(tokens_gen):
+                        async for chunk_text in tokens_gen:
+                            if region_filter is not None:
+                                raw_output_text += chunk_text
+                                visible = region_filter.feed(chunk_text)
+                                if not visible:
+                                    continue
+                                full_output_text += visible
+                            else:
+                                visible = chunk_text
+                                full_output_text += visible
+                            chunk_payload = {
+                                "id": request_id,
+                                "object": "chat.completion.chunk",
+                                "created": created_time,
+                                "model": model_name,
+                                "choices": [
+                                    {
+                                        "index": 0,
+                                        "delta": {"content": visible},
+                                        "finish_reason": None,
+                                    }
+                                ],
+                            }
+                            yield f"data: {json.dumps(chunk_payload, ensure_ascii=False)}\n\n"
 
                     # 流结束: 若已进入工具/思考区域则吞掉残余文本，否则冲刷尾部可见内容。
                     # 思考未闭合时保留尾部 (无 tools 的普通回答常被 max_tokens 截断于思考区，

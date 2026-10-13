@@ -108,6 +108,8 @@ class ModelManager:
                     enable_mtp=enable_mtp,
                     mtp_depth=mtp_depth,
                     code_agent_mode=code_agent_mode,
+                    prompt_cache_max_entries=perf.prompt_cache_max_entries if perf else 4,
+                    prompt_cache_max_tokens=perf.prompt_cache_max_tokens if perf else 8192,
                 )
             else:
                 engine = MLXModelEngine(

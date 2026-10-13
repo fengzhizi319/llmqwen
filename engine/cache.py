@@ -15,6 +15,10 @@ class ResponseCache:
     """线程安全的 LRU + TTL 响应缓存器"""
 
     def __init__(self, max_size: int = 1024, ttl_seconds: int = 3600, enabled: bool = True):
+        if max_size < 0:
+            raise ValueError("max_size must be non-negative")
+        if ttl_seconds < 0:
+            raise ValueError("ttl_seconds must be non-negative")
         self.max_size = max_size
         self.ttl_seconds = ttl_seconds
         self.enabled = enabled
@@ -40,8 +44,8 @@ class ResponseCache:
             "prefix": prefix,
             "model": model,
             "prompt": prompt,
-            "temperature": round(temperature, 2),
-            "top_p": round(top_p, 2),
+            "temperature": temperature,
+            "top_p": top_p,
             "stop": stop,
             "extra": extra,
         }
@@ -59,7 +63,7 @@ class ResponseCache:
                 return None
 
             value, timestamp = self._cache[key]
-            now = time.time()
+            now = time.monotonic()
 
             # 检查是否过期
             if self.ttl_seconds > 0 and (now - timestamp) > self.ttl_seconds:
@@ -78,7 +82,7 @@ class ResponseCache:
             return
 
         with self._lock:
-            now = time.time()
+            now = time.monotonic()
             if key in self._cache:
                 self._cache.move_to_end(key)
             self._cache[key] = (value, now)

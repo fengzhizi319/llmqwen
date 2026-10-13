@@ -4,6 +4,7 @@ AI Code Service - Standard Text/Code Completions API 路由
 """
 
 import json
+from contextlib import aclosing
 import time
 import uuid
 from typing import Dict, Any, List
@@ -79,6 +80,7 @@ async def create_completion(
         stop=req.stop,
         echo=req.echo,
         seed=req.seed,
+        max_tokens=req.max_tokens or 512,
     )
 
     stream_chunk_size = (
@@ -101,22 +103,23 @@ async def create_completion(
                         seed=req.seed,
                         chunk_size=stream_chunk_size,
                     )
-                    async for chunk_text in tokens_gen:
-                        chunk_payload = {
-                            "id": request_id,
-                            "object": "text_completion",
-                            "created": created_time,
-                            "model": model_name,
-                            "choices": [
-                                {
-                                    "index": 0,
-                                    "text": chunk_text,
-                                    "logprobs": None,
-                                    "finish_reason": None,
-                                }
-                            ],
-                        }
-                        yield f"data: {json.dumps(chunk_payload, ensure_ascii=False)}\n\n"
+                    async with aclosing(tokens_gen):
+                        async for chunk_text in tokens_gen:
+                            chunk_payload = {
+                                "id": request_id,
+                                "object": "text_completion",
+                                "created": created_time,
+                                "model": model_name,
+                                "choices": [
+                                    {
+                                        "index": 0,
+                                        "text": chunk_text,
+                                        "logprobs": None,
+                                        "finish_reason": None,
+                                    }
+                                ],
+                            }
+                            yield f"data: {json.dumps(chunk_payload, ensure_ascii=False)}\n\n"
 
                 done_payload = {
                     "id": request_id,

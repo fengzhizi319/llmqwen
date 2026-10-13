@@ -1,0 +1,466 @@
+{
+  "timestamp_utc": "2026-10-13T14:30:15.570344+00:00",
+  "model": "qwen3.8-flash-next-oq4e-mtp-128k",
+  "model_path": "/Users/charles/.cache/modelscope/models/jedisct1--Qwen3.8-Flash-Next-oQ4e-MTP-128k/snapshots/master",
+  "python": "3.13.15 | packaged by conda-forge | (main, Aug 10 2026, 13:01:04) [Clang 19.1.7 ]",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "versions": {
+    "mlx": "0.32.1",
+    "mlx-lm": "0.31.3",
+    "transformers": "5.15.1"
+  },
+  "load_seconds": 14.575139915999898,
+  "max_output_tokens": 32,
+  "prefill_step_size": 2048,
+  "cache_limits": {
+    "entries": 0,
+    "max_entries": 4,
+    "max_tokens_per_entry": 8192,
+    "hits": 0,
+    "misses": 0,
+    "reused_tokens": 0,
+    "retained_tokens": 0,
+    "state_bytes": 0
+  },
+  "runs": [
+    {
+      "name": "kernel_warmup",
+      "cache_enabled": false,
+      "mtp_enabled": false,
+      "prompt_tokens": 73,
+      "output": "```python\ndef add(a, b):\n    return a + b\n```",
+      "completion_tokens": 17,
+      "ttft_seconds": 12.862455458999648,
+      "total_seconds": 13.39376483399974,
+      "reused_tokens": 0,
+      "prefill_tokens": 72,
+      "prefill_seconds": 9.93706179200035,
+      "cache": {
+        "entries": 0,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 0,
+        "misses": 0,
+        "reused_tokens": 0,
+        "retained_tokens": 0,
+        "state_bytes": 0
+      },
+      "memory": {
+        "active_memory_mb": 90078.87,
+        "cache_memory_mb": 133.94,
+        "peak_memory_mb": 90398.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "repeat_baseline",
+      "cache_enabled": false,
+      "mtp_enabled": false,
+      "prompt_tokens": 790,
+      "output": "```python\ndef add(a, b):\n    \"\"\"\n    Adds two numbers together.\n    \n    Args:\n        a (int or float):",
+      "completion_tokens": 32,
+      "ttft_seconds": 3.147892999999385,
+      "total_seconds": 4.132373874999757,
+      "reused_tokens": 0,
+      "prefill_tokens": 789,
+      "prefill_seconds": 1.8065875420006705,
+      "cache": {
+        "entries": 0,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 0,
+        "misses": 0,
+        "reused_tokens": 0,
+        "retained_tokens": 0,
+        "state_bytes": 0
+      },
+      "memory": {
+        "active_memory_mb": 90078.87,
+        "cache_memory_mb": 159.59,
+        "peak_memory_mb": 91655.57
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "repeat_cache_cold",
+      "cache_enabled": true,
+      "mtp_enabled": false,
+      "prompt_tokens": 790,
+      "output": "```python\ndef add(a, b):\n    \"\"\"\n    Adds two numbers together.\n    \n    Args:\n        a (int or float):",
+      "completion_tokens": 32,
+      "ttft_seconds": 4.6311039580004945,
+      "total_seconds": 5.622719166000024,
+      "reused_tokens": 0,
+      "prefill_tokens": 789,
+      "prefill_seconds": 3.220423290999861,
+      "cache": {
+        "entries": 2,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 0,
+        "misses": 1,
+        "reused_tokens": 0,
+        "retained_tokens": 1553,
+        "state_bytes": 280719392
+      },
+      "memory": {
+        "active_memory_mb": 90347.53,
+        "cache_memory_mb": 156.75,
+        "peak_memory_mb": 91703.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "repeat_cache_warm",
+      "cache_enabled": true,
+      "mtp_enabled": false,
+      "prompt_tokens": 790,
+      "output": "```python\ndef add(a, b):\n    \"\"\"\n    Adds two numbers together.\n    \n    Args:\n        a (int or float):",
+      "completion_tokens": 32,
+      "ttft_seconds": 0.26686195900038,
+      "total_seconds": 1.2515265000001818,
+      "reused_tokens": 789,
+      "prefill_tokens": 0,
+      "prefill_seconds": 0.0009386669999003061,
+      "cache": {
+        "entries": 2,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 1,
+        "misses": 1,
+        "reused_tokens": 789,
+        "retained_tokens": 1553,
+        "state_bytes": 280719392
+      },
+      "memory": {
+        "active_memory_mb": 90347.53,
+        "cache_memory_mb": 156.8,
+        "peak_memory_mb": 91703.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "branch_baseline",
+      "cache_enabled": false,
+      "mtp_enabled": false,
+      "prompt_tokens": 790,
+      "output": "```python\ndef subtract(a, b):\n    \"\"\"\n    Subtract b from a.\n    \n    Args:\n        a: The minuend.",
+      "completion_tokens": 32,
+      "ttft_seconds": 3.199519832999613,
+      "total_seconds": 4.197739917000035,
+      "reused_tokens": 0,
+      "prefill_tokens": 789,
+      "prefill_seconds": 1.7444532500003334,
+      "cache": {
+        "entries": 2,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 1,
+        "misses": 1,
+        "reused_tokens": 789,
+        "retained_tokens": 1553,
+        "state_bytes": 280719392
+      },
+      "memory": {
+        "active_memory_mb": 90347.53,
+        "cache_memory_mb": 159.65,
+        "peak_memory_mb": 91924.23
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "branch_cache",
+      "cache_enabled": true,
+      "mtp_enabled": false,
+      "prompt_tokens": 790,
+      "output": "```python\ndef subtract(a, b):\n    \"\"\"\n    Subtract b from a.\n    \n    Args:\n        a: The minuend.",
+      "completion_tokens": 32,
+      "ttft_seconds": 0.39362283300033596,
+      "total_seconds": 1.386421875000451,
+      "reused_tokens": 764,
+      "prefill_tokens": 25,
+      "prefill_seconds": 0.13041625000005297,
+      "cache": {
+        "entries": 3,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 2,
+        "misses": 1,
+        "reused_tokens": 1553,
+        "retained_tokens": 2342,
+        "state_bytes": 424562736
+      },
+      "memory": {
+        "active_memory_mb": 90485.36,
+        "cache_memory_mb": 156.58,
+        "peak_memory_mb": 91924.23
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "multiturn_baseline",
+      "cache_enabled": false,
+      "mtp_enabled": false,
+      "prompt_tokens": 843,
+      "output": "```python\ndef multiply(a, b):\n    \"\"\"\n    Multiplies two numbers together.\n    \n    Args:\n        a (int or float",
+      "completion_tokens": 32,
+      "ttft_seconds": 3.262498707999839,
+      "total_seconds": 4.281353874999695,
+      "reused_tokens": 0,
+      "prefill_tokens": 842,
+      "prefill_seconds": 1.9768076250002196,
+      "cache": {
+        "entries": 3,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 2,
+        "misses": 1,
+        "reused_tokens": 1553,
+        "retained_tokens": 2342,
+        "state_bytes": 424562736
+      },
+      "memory": {
+        "active_memory_mb": 90485.36,
+        "cache_memory_mb": 159.83,
+        "peak_memory_mb": 92155.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "multiturn_cache",
+      "cache_enabled": true,
+      "mtp_enabled": false,
+      "prompt_tokens": 843,
+      "output": "```python\ndef multiply(a, b):\n    \"\"\"\n    Multiplies two numbers together.\n    \n    Args:\n        a (int or float",
+      "completion_tokens": 32,
+      "ttft_seconds": 0.5671264590000646,
+      "total_seconds": 1.6519721670001672,
+      "reused_tokens": 764,
+      "prefill_tokens": 78,
+      "prefill_seconds": 0.31084870799986675,
+      "cache": {
+        "entries": 4,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 3,
+        "misses": 1,
+        "reused_tokens": 2317,
+        "retained_tokens": 3184,
+        "state_bytes": 568406080
+      },
+      "memory": {
+        "active_memory_mb": 90623.21,
+        "cache_memory_mb": 157.18,
+        "peak_memory_mb": 92155.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "short_baseline",
+      "cache_enabled": false,
+      "mtp_enabled": false,
+      "prompt_tokens": 73,
+      "output": "```python\ndef add(a, b):\n    return a + b\n```",
+      "completion_tokens": 17,
+      "ttft_seconds": 0.5116649999999936,
+      "total_seconds": 1.048088708999785,
+      "reused_tokens": 0,
+      "prefill_tokens": 72,
+      "prefill_seconds": 0.2542959999991581,
+      "cache": {
+        "entries": 4,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 3,
+        "misses": 1,
+        "reused_tokens": 2317,
+        "retained_tokens": 3184,
+        "state_bytes": 568406080
+      },
+      "memory": {
+        "active_memory_mb": 90623.21,
+        "cache_memory_mb": 134.12,
+        "peak_memory_mb": 92155.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "short_cache",
+      "cache_enabled": true,
+      "mtp_enabled": false,
+      "prompt_tokens": 73,
+      "output": "```python\ndef add(a, b):\n    return a + b\n```",
+      "completion_tokens": 17,
+      "ttft_seconds": 0.5472700410000471,
+      "total_seconds": 1.0866124580006726,
+      "reused_tokens": 0,
+      "prefill_tokens": 72,
+      "prefill_seconds": 0.2918988339997668,
+      "cache": {
+        "entries": 4,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 3,
+        "misses": 2,
+        "reused_tokens": 2317,
+        "retained_tokens": 1725,
+        "state_bytes": 526159936
+      },
+      "memory": {
+        "active_memory_mb": 90582.94,
+        "cache_memory_mb": 133.0,
+        "peak_memory_mb": 92155.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "after_abort_cache",
+      "cache_enabled": true,
+      "mtp_enabled": false,
+      "prompt_tokens": 790,
+      "output": "```python\ndef add(a, b):\n    \"\"\"\n    Adds two numbers together.\n    \n    Args:\n        a (int or float):",
+      "completion_tokens": 32,
+      "ttft_seconds": 0.25600062500052445,
+      "total_seconds": 1.2580793750003068,
+      "reused_tokens": 789,
+      "prefill_tokens": 0,
+      "prefill_seconds": 0.0009357499993711826,
+      "cache": {
+        "entries": 4,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 5,
+        "misses": 2,
+        "reused_tokens": 3870,
+        "retained_tokens": 1672,
+        "state_bytes": 526159936
+      },
+      "memory": {
+        "active_memory_mb": 90582.91,
+        "cache_memory_mb": 156.71,
+        "peak_memory_mb": 92155.72
+      },
+      "mtp_drafted_tokens": 0,
+      "mtp_accepted_tokens": 0
+    },
+    {
+      "name": "mtp_cached_prefix_first",
+      "cache_enabled": true,
+      "mtp_enabled": true,
+      "prompt_tokens": 790,
+      "output": "```python\ndef add(a, b):\n    \"\"\"\n    Adds two numbers together.\n    \n    Args:\n        a (int or float):",
+      "completion_tokens": 32,
+      "ttft_seconds": 0.1272942920004425,
+      "total_seconds": 0.8102625419996912,
+      "reused_tokens": 789,
+      "prefill_tokens": 0,
+      "prefill_seconds": 0.0009319159998995019,
+      "cache": {
+        "entries": 4,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 6,
+        "misses": 2,
+        "reused_tokens": 4659,
+        "retained_tokens": 1672,
+        "state_bytes": 526159936
+      },
+      "memory": {
+        "active_memory_mb": 90582.91,
+        "cache_memory_mb": 370.64,
+        "peak_memory_mb": 92155.72
+      },
+      "mtp_drafted_tokens": 26,
+      "mtp_accepted_tokens": 23
+    },
+    {
+      "name": "mtp_cached_prefix_repeat",
+      "cache_enabled": true,
+      "mtp_enabled": true,
+      "prompt_tokens": 790,
+      "output": "```python\ndef add(a, b):\n    \"\"\"\n    Adds two numbers together.\n    \n    Args:\n        a (int or float):",
+      "completion_tokens": 32,
+      "ttft_seconds": 0.12385945900041406,
+      "total_seconds": 0.7171691670000655,
+      "reused_tokens": 789,
+      "prefill_tokens": 0,
+      "prefill_seconds": 0.0008990420001282473,
+      "cache": {
+        "entries": 4,
+        "max_entries": 4,
+        "max_tokens_per_entry": 8192,
+        "hits": 7,
+        "misses": 2,
+        "reused_tokens": 5448,
+        "retained_tokens": 1672,
+        "state_bytes": 526159936
+      },
+      "memory": {
+        "active_memory_mb": 90582.91,
+        "cache_memory_mb": 371.08,
+        "peak_memory_mb": 92155.72
+      },
+      "mtp_drafted_tokens": 52,
+      "mtp_accepted_tokens": 46
+    }
+  ],
+  "validation": "passed",
+  "final_stats": {
+    "model_name": "qwen3.8-flash-next-oq4e-mtp-128k",
+    "engine_type": "qwen4_exp",
+    "loaded": true,
+    "has_mtp": true,
+    "enable_mtp": true,
+    "mtp_depth": 3,
+    "mtp_drafted_tokens": 52,
+    "mtp_accepted_tokens": 46,
+    "code_agent_mode": true,
+    "prefix_cache_hits": 7,
+    "prefix_cache": {
+      "entries": 4,
+      "max_entries": 4,
+      "max_tokens_per_entry": 8192,
+      "hits": 7,
+      "misses": 2,
+      "reused_tokens": 5448,
+      "retained_tokens": 1672,
+      "state_bytes": 526159936
+    },
+    "last_reused_tokens": 789,
+    "last_prefill_tokens": 0,
+    "last_prefill_seconds": 0.000899,
+    "resolved_path": "/Users/charles/.cache/modelscope/models/jedisct1--Qwen3.8-Flash-Next-oQ4e-MTP-128k/snapshots/master",
+    "kv_bits": 8,
+    "prefill_step_size": 2048,
+    "enable_thinking": true,
+    "strip_thinking": false,
+    "total_requests": 13,
+    "total_prompt_tokens": 1580,
+    "total_generation_tokens": 64,
+    "last_prompt_tps": 29.11,
+    "last_generation_tps": 54.42,
+    "active_memory_mb": 90582.91,
+    "cache_memory_mb": 371.08,
+    "peak_memory_mb": 92155.72
+  },
+  "post_unload_cache": {
+    "entries": 0,
+    "max_entries": 4,
+    "max_tokens_per_entry": 8192,
+    "hits": 0,
+    "misses": 0,
+    "reused_tokens": 0,
+    "retained_tokens": 0,
+    "state_bytes": 0
+  }
+}

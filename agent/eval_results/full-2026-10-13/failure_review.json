@@ -1,0 +1,118 @@
+{
+  "humaneval:130": {
+    "entry_point": "tri",
+    "failure": "IndexError: list index out of range",
+    "diagnosis": "为偶数 n 额外计算不需要的奇数索引 n+1，访问 result[n+2] 越界；循环边界与输出边界混淆。",
+    "evidence": "for i in range(3, n + 2, 2): result[i] = result[i - 1] + result[i - 2] + result[i + 1]",
+    "capability_implication": "需要验证前向依赖、最大索引、奇偶输入边界；长注释中的自我修正未落实为正确边界。",
+    "regenerated": false
+  },
+  "humaneval:132": {
+    "entry_point": "is_nested",
+    "failure": "AssertionError",
+    "diagnosis": "仅使用扫描时的最大括号深度判断嵌套，没有保证匹配并闭合；例如 [[[[[[[[ 或 [[] 被误判为真。",
+    "capability_implication": "需要同时满足匹配完整性与局部嵌套条件，不能仅用中间状态判断结果。",
+    "regenerated": false
+  },
+  "humaneval:140": {
+    "entry_point": "fix_spaces",
+    "failure": "AssertionError",
+    "diagnosis": "将 1~2 个空格统一替换成一个下划线，错误地把两个空格压缩为一个，而测试要求两个下划线。",
+    "capability_implication": "自然语言条件中的数量保持和分组替换容易遗漏，需要边界样例。",
+    "regenerated": false
+  },
+  "humaneval:145": {
+    "entry_point": "order_by_points",
+    "failure": "AssertionError",
+    "diagnosis": "排序键只计算 abs(n) 的数字和，忽略题目示例中的负号约定；原题第一个示例就不能通过。",
+    "capability_implication": "需要用题目给出的显式示例检查语义，不能以常见定义替代任务约定。",
+    "regenerated": false
+  },
+  "humaneval:163": {
+    "entry_point": "generate_integers",
+    "diagnosis": "把 even digits 解释为任意偶数，没有限制为单个数字；(10,14) 应为空，却返回 [10,12,14]。",
+    "regenerated": false
+  },
+  "mbpp:1": {
+    "entry_point": "min_cost",
+    "diagnosis": "动态规划只考虑上方和左方，遗漏题目测试允许的左上对角移动。",
+    "regenerated": false
+  },
+  "mbpp:13": {
+    "entry_point": "count_common",
+    "diagnosis": "返回所有词频项，未从公开测试推断只需前四项。",
+    "regenerated": false
+  },
+  "mbpp:15": {
+    "entry_point": "split_lowerstring",
+    "diagnosis": "只筛选小写字符，未保留每个小写字母后的非小写字符；AbCd 应返回 bC、d。",
+    "regenerated": false
+  },
+  "mbpp:16": {
+    "entry_point": "text_lowercase_underscore",
+    "diagnosis": "正则未加首尾锚点，含大写前缀的字符串也被子串匹配判为通过。",
+    "regenerated": false
+  },
+  "mbpp:31": {
+    "entry_point": "func",
+    "diagnosis": "使用按频率降序的 nlargest 返回结果，公开测试要求所选元素按堆弹出顺序返回，含同频数值排序。",
+    "regenerated": false
+  },
+  "mbpp:34": {
+    "entry_point": "find_missing",
+    "diagnosis": "误把第二参数当预期总和，实际为搜索长度；公开样例不能通过。",
+    "regenerated": false
+  },
+  "mbpp:42": {
+    "diagnosis": "只累加重复元素的不同取值，测试要求累加这些取值的全部出现次数。",
+    "regenerated": false
+  },
+  "mbpp:48": {
+    "diagnosis": "设置位时至少遍历32位，错误地把原数有效位以外的高位也置1；注释给出正确样例但循环不一致。",
+    "regenerated": false
+  },
+  "mbpp:50": {
+    "diagnosis": "把返回元组第一项误作1起始索引，测试要求最短列表长度。",
+    "regenerated": false
+  },
+  "mbpp:55": {
+    "diagnosis": "将位置参数定义成(a,r,n)，实际测试约定为(a,n,r)。",
+    "regenerated": false
+  },
+  "mbpp:60": {
+    "diagnosis": "把第二参数当最大相邻差，测试约定第二参数是长度、相邻差绝对值为1。",
+    "regenerated": false
+  },
+  "mbpp:77": {
+    "diagnosis": "按数字值奇偶分组并判断两组和相等，而公开测试/参考实现要求判断能否被11整除；题文对位置差和判定规则不完整。",
+    "regenerated": false
+  },
+  "mbpp:83": {
+    "diagnosis": "直接使用ASCII值求和再取模，未按a=1等字母序号映射。",
+    "regenerated": false
+  },
+  "mbpp:87": {
+    "diagnosis": "重复键保留后字典值，测试要求前字典优先。",
+    "regenerated": false
+  },
+  "mbpp:101": {
+    "diagnosis": "误将第k个元素理解为第k小元素，排序后改变原数组次序。",
+    "regenerated": false
+  },
+  "mbpp:108": {
+    "diagnosis": "直接使用heapq.merge，忽略公开测试实际提供未排序输入。",
+    "regenerated": false
+  },
+  "mbpp:110": {
+    "diagnosis": "实现常规区间补集，公开测试却要求每段前间隙及该段末端至总末端的重叠范围，题文和预期存在歧义。",
+    "regenerated": false
+  },
+  "mbpp:111": {
+    "diagnosis": "按第一列表顺序输出集合交集，但公开测试固定另一种列表顺序；集合内容正确仍失败。",
+    "regenerated": false
+  },
+  "mbpp:198": {
+    "diagnosis": "输出达到2048-token上限，末尾三引号未闭合导致SyntaxError；属于生成预算耗尽后的代码截断。",
+    "regenerated": false
+  }
+}

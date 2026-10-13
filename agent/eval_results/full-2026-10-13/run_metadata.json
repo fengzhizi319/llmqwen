@@ -1,0 +1,64 @@
+{
+  "started_utc": "2026-10-13T15:00:17.003184+00:00",
+  "configuration": {
+    "performance": {
+      "enable_cache": false,
+      "cache_max_size": 1024,
+      "cache_ttl_seconds": 3600,
+      "max_concurrency": 1,
+      "metal_cache_limit_mb": 2048,
+      "clear_cache_after_generation": false,
+      "stream_chunk_size": 1,
+      "kv_bits": 8,
+      "kv_group_size": 64,
+      "prefill_step_size": 2048,
+      "enable_prompt_cache": true,
+      "prompt_cache_max_entries": 4,
+      "prompt_cache_max_tokens": 8192,
+      "enable_mtp": true,
+      "mtp_depth": 3,
+      "code_agent_mode": true,
+      "default_temperature": 0.0
+    },
+    "default_model": "qwen3.8-flash-next-oq4e-mtp-128k",
+    "use_mock": false,
+    "system_prompt": "你是一个专业的 AI 编程助手。你的职责是：\n1. 帮助开发者编写、调试、重构和优化代码\n2. 解释代码逻辑和技术概念并生成清晰的代码注释\n3. 提供最佳实践和设计模式建议\n4. 支持多种编程语言和框架\n\n回答时请：\n- 直接输出解答内容与完整的带注释代码，不要输出 <tool_call> 标签。\n- 代码示例要完整、可运行、包含详细规范的注释。\n- 解释要清晰简洁，遵循行业最佳实践。\n- 如果用户未提供具体代码片段，请直接引导用户提供目标代码或在编辑器中选中代码。\n",
+    "models": {
+      "qwen3.8-flash-next-oq4e-mtp-128k": {
+        "path": "jedisct1/Qwen3.8-Flash-Next-oQ4e-MTP-128k",
+        "description": "Qwen3.8 Flash Next oQ4e MTP 128K (Qwen4Exp 架构，内置 MoE MTP，支持 128K 上下文)",
+        "engine_type": "qwen4_exp",
+        "context_length": 131072
+      }
+    }
+  },
+  "response_cache": "disabled",
+  "temperature": 0.0,
+  "max_tokens": 2048,
+  "test_timeout_seconds": 15,
+  "expected": {
+    "humaneval": 164,
+    "mbpp": 974
+  },
+  "backend_restarts": 0,
+  "tracked_worktree_diff_sha256": "478f04785b46511b483dc75ce3ab56f93176db083ca3108c7315448839304bca",
+  "source_sha256": {
+    "engine/qwen4_exp_engine.py": "0773ee7151927b3378dee59c93e1f0c4bc299a57d06707a0aae3033da2debc44",
+    "engine/prefix_cache.py": "e1cca269b542e6700371e194172b284800b59cf6b5953d0b8c04d07ffde63911",
+    "agent/eval_humaneval.py": "0aac86ae675e18f4ed94bc3d59b7f99b9d4cb977919f41e0e4e7d43ebb7d72d6"
+  },
+  "model_path": "/Users/charles/.cache/modelscope/models/jedisct1--Qwen3.8-Flash-Next-oQ4e-MTP-128k/snapshots/master",
+  "initial_memory": {
+    "active_memory_mb": 90078.87,
+    "cache_memory_mb": 0.02,
+    "peak_memory_mb": 90078.87
+  },
+  "model_metadata_sha256": {
+    "config.json": "1ea6af3ea3d949ca6637e1c2614510362cfffeb04973db951cfd051f23674536",
+    "model.safetensors.index.json": "72315d4eb5f494fd7b9c97b36edc74a606c9894eb714d2893c06abf7468da9c6",
+    "omlx_support/qwen4_exp.py": "1286f07531160166cdd5f18d2a74da131e74909cdf1269918eaaf9c91460d406"
+  },
+  "status": "stopped_by_user",
+  "stopped_utc": "2026-10-13T23:04:17.982872+00:00",
+  "stop_reason": "用户要求停止剩余题目，评估已完成结果"
+}

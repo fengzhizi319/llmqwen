@@ -171,6 +171,7 @@ def real_engine():
     # mlx_vlm 有 processor，mlx_lm/qwen4_exp 有 tokenizer
     assert getattr(engine, "processor", None) is not None or getattr(engine, "tokenizer", None) is not None
     yield engine
+    engine.unload_model()
 
 
 @pytest.fixture(scope="module")
@@ -718,3 +719,74 @@ def test_engine_memory_stats(real_engine):
     if mem:
         assert "active_memory_mb" in mem
         assert mem["active_memory_mb"] > 0
+
+
+@pytest.mark.parametrize("depth", [1, 2, 3])
+def test_qwen4_prefix_and_mtp_match_greedy(real_engine, real_manager, depth):
+    """Real weights: both speculative acceptance/replay and cache preserve output."""
+    from engine.qwen4_exp_engine import Qwen4ExpEngine
+    if not isinstance(real_engine, Qwen4ExpEngine):
+        pytest.skip("Qwen4Exp-specific cache test")
+    original = (real_engine.enable_mtp, real_engine.enable_prompt_cache, real_engine.mtp_depth)
+    prompt = real_manager.build_chat_prompt([
+        {"role": "system", "content": "You are a concise coding assistant."},
+        {"role": "user", "content": "Write a Python function add(a, b). Only output code."},
+    ], enable_thinking=False)
+    try:
+        real_engine.enable_mtp = real_engine.enable_prompt_cache = False
+        baseline = real_engine.generate(prompt, max_tokens=64, temperature=0)
+        real_engine._prefix_cache.clear()
+        real_engine.enable_prompt_cache = True
+        cold = real_engine.generate(prompt, max_tokens=64, temperature=0)
+        real_engine.enable_mtp = True
+        real_engine.mtp_depth = depth
+        warm = real_engine.generate(prompt, max_tokens=64, temperature=0)
+        assert baseline == cold == warm
+        assert real_engine._last_reused_tokens > 0
+        assert real_engine._mtp_drafted_tokens > 0
+    finally:
+        real_engine.enable_mtp, real_engine.enable_prompt_cache, real_engine.mtp_depth = original
+
+
+def test_qwen4_cached_tool_loop(real_engine, real_manager):
+    """Actual route: generate a tool call, then consume its result with cached state."""
+    from engine.qwen4_exp_engine import Qwen4ExpEngine
+    if not isinstance(real_engine, Qwen4ExpEngine):
+        pytest.skip("Qwen4Exp-specific cache test")
+    tools = [{"type": "function", "function": {
+        "name": "add_numbers", "description": "Add two numbers and return their sum.",
+        "parameters": {"type": "object", "properties": {
+            "a": {"type": "integer"}, "b": {"type": "integer"},
+        }, "required": ["a", "b"]},
+    }}]
+    messages = [ChatMessage(role="user", content="Use add_numbers to calculate 19 + 23.")]
+    request = ChatCompletionRequest(model=MODEL_NAME, messages=messages, tools=tools,
+                                    temperature=0, max_tokens=128, enable_thinking=False)
+    original = (real_engine.enable_mtp, real_engine.enable_prompt_cache)
+    try:
+        real_engine._prefix_cache.clear()
+        real_engine.enable_mtp = real_engine.enable_prompt_cache = False
+        baseline = _run_async(create_chat_completion(request, response=_make_mock_response(), manager=real_manager))
+        real_engine.enable_prompt_cache = True
+        cold = _run_async(create_chat_completion(request, response=_make_mock_response(), manager=real_manager))
+        real_engine.enable_mtp = True
+        warm = _run_async(create_chat_completion(request, response=_make_mock_response(), manager=real_manager))
+        for result in [baseline, cold, warm]:
+            choice = result.choices[0]
+            assert choice.finish_reason == "tool_calls"
+            call = choice.message.tool_calls[0]
+            assert call.function.name == "add_numbers"
+            assert json.loads(call.function.arguments) == {"a": 19, "b": 23}
+        assert real_engine._last_reused_tokens > 0
+        call = warm.choices[0].message.tool_calls[0]
+        followup = ChatCompletionRequest(model=MODEL_NAME, tools=tools,
+            messages=messages + [warm.choices[0].message,
+                ChatMessage(role="tool", tool_call_id=call.id, content="42"),
+                ChatMessage(role="user", content="Return only the final numeric result. Do not call tools again.")],
+            temperature=0, max_tokens=64, enable_thinking=False)
+        result = _run_async(create_chat_completion(followup, response=_make_mock_response(), manager=real_manager))
+        assert "42" in (result.choices[0].message.content or "")
+        assert not result.choices[0].message.tool_calls
+        assert real_engine._last_reused_tokens > 0
+    finally:
+        real_engine.enable_mtp, real_engine.enable_prompt_cache = original

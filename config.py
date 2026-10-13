@@ -18,7 +18,7 @@ load_dotenv(Path(__file__).resolve().parent / ".env", override=False)
 
 class ServerConfig(BaseModel):
     host: str = "0.0.0.0"
-    port: int = 1235
+    port: int = Field(default=1235, ge=1, le=65535)
     reload: bool = False
     cors_origins: List[str] = Field(default_factory=lambda: ["*"])
     api_key: Optional[str] = None
@@ -27,16 +27,18 @@ class ServerConfig(BaseModel):
 class PerformanceConfig(BaseModel):
     """LLM 推理与服务性能优化配置"""
     enable_cache: bool = True               # 是否启用响应与 Prompt LRU 缓存
-    cache_max_size: int = 1024              # 缓存最大条目数
-    cache_ttl_seconds: int = 3600           # 缓存过期时间（秒，默认 1 小时）
-    max_concurrency: int = 3                # 最大并发推理任务数 (256K 上下文推荐 2~3 并发)
+    cache_max_size: int = Field(default=1024, ge=0)              # 缓存最大条目数
+    cache_ttl_seconds: int = Field(default=3600, ge=0)           # 缓存过期时间（秒，默认 1 小时）
+    max_concurrency: int = Field(default=3, ge=1)                # 最大并发推理任务数 (256K 上下文推荐 2~3 并发)
     metal_cache_limit_mb: int = 8192        # Apple Silicon MLX Metal 缓存上限 (MB, 默认 8GB)
     clear_cache_after_generation: bool = False  # 是否在每次生成后显式清理 Metal 缓存
-    stream_chunk_size: int = 1              # 流式响应 Token 聚合块大小
+    stream_chunk_size: int = Field(default=1, ge=1)              # 流式响应 Token 聚合块大小
     kv_bits: Optional[int] = 8              # KV Cache 显存量化位数 (8bit 节省 50% KV 显存，长文本提速 30%~50%)
     kv_group_size: int = 64                 # KV Cache 量化分组大小
     prefill_step_size: int = 2048           # 分块预填充大小 (Chunked Prefill，平抑 256K 超大文本峰值显存)
-    enable_prompt_cache: bool = True        # 是否启用前缀/系统提示词 KV Cache 复用 (<5ms 首字延迟)
+    enable_prompt_cache: bool = True        # 是否启用前缀完整状态快照复用
+    prompt_cache_max_entries: int = Field(default=4, ge=0)
+    prompt_cache_max_tokens: int = Field(default=8192, ge=0)
     enable_mtp: bool = True                 # 🚀 是否启用 MTP (Multi-Token Prediction) 多 Token 推测解码 (Flash-Next 47->96 tok/s)
     mtp_depth: int = 3                      # 🚀 MTP 解码深度 (1~3: 深度3可冲刺至 135+ tok/s，在代码高局部可预测性下收益最大)
     code_agent_mode: bool = True            # 🚀 Code Agent 专项加速模式 (低温确定性采样、工具闭合标签立即截断、长前缀持久复用)
@@ -48,7 +50,7 @@ class ModelSpec(BaseModel):
     path: str
     description: str = ""
     engine_type: str = "auto"  # auto, mlx_lm, mlx_vlm, mock
-    context_length: int = 262144  # 默认 256K (262,144 Tokens) 超长上下文
+    context_length: int = Field(default=262144, ge=1)  # 默认 256K (262,144 Tokens) 超长上下文
 
 
 class AppConfig(BaseModel):
@@ -70,8 +72,10 @@ class AppConfig(BaseModel):
     models: Dict[str, ModelSpec] = Field(default_factory=dict)
 
 
-def load_config(config_path: str = "config.yaml") -> AppConfig:
+def load_config(config_path: Optional[str] = None) -> AppConfig:
     """加载并解析 YAML 配置文件，支持环境变量覆盖"""
+    if config_path is None:
+        config_path = str(Path(__file__).resolve().parent / "config.yaml")
     config_dict = {}
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
@@ -87,7 +91,7 @@ def load_config(config_path: str = "config.yaml") -> AppConfig:
             parsed_models[name] = spec
 
     server_data = config_dict.get("server", {})
-    if "api_key" not in server_data and os.getenv("API_KEY"):
+    if "API_KEY" in os.environ:
         server_data["api_key"] = os.getenv("API_KEY")
 
     if os.getenv("HOST"):
@@ -102,8 +106,8 @@ def load_config(config_path: str = "config.yaml") -> AppConfig:
     return AppConfig(
         server=ServerConfig(**server_data),
         performance=PerformanceConfig(**perf_data),
-        default_model=config_dict.get("default_model", os.getenv("DEFAULT_MODEL", "qwen3.8-flash-next-oq4e-mtp-128k")),
-        use_mock=config_dict.get("use_mock", os.getenv("USE_MOCK", "").lower() in ("true", "1")),
+        default_model=os.getenv("DEFAULT_MODEL", config_dict.get("default_model", AppConfig.model_fields["default_model"].default)),
+        use_mock=os.environ["USE_MOCK"].lower() in ("true", "1") if "USE_MOCK" in os.environ else config_dict.get("use_mock", False),
         system_prompt=config_dict.get("system_prompt", AppConfig().system_prompt),
         models=parsed_models,
     )

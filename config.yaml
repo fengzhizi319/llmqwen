@@ -20,9 +20,11 @@ performance:
   kv_bits: 8                        # 🚀 KV Cache 量化位数 (8bit 节省 50% 显存，长代码文本提速 30%~50%)
   kv_group_size: 64                 # KV Cache 量化 Group 大小
   prefill_step_size: 2048           # 🚀 分块预填充 (Chunked Prefill, 压低 128K/256K 超大代码上下文峰值显存)
-  enable_prompt_cache: true         # 🚀 提示词/系统前缀 KV Cache 跨轮次持久化复用 (<5ms 首字秒出)
-  enable_mtp: true                  # 🚀 MTP (Multi-Token Prediction) 多 Token 推测解码 (Flash-Next 47->96 tok/s)
-  mtp_depth: 3                      # 🚀 MTP 解码深度 (1~3: 深度3可提升至 135+ tok/s，在代码高可预测性下收益最大)
+  enable_prompt_cache: true         # Qwen4Exp 完整状态快照，匹配 token 前缀后增量预填充
+  prompt_cache_max_entries: 4       # 每个 Qwen4Exp 引擎最多保存 4 个 LRU 前缀快照
+  prompt_cache_max_tokens: 8192     # 每个快照最多覆盖 8192 tokens；不限制模型上下文长度
+  enable_mtp: true                  # Qwen4Exp 贪婪 MTP；拒绝草稿时恢复完整状态并重放
+  mtp_depth: 3                      # 草稿深度 1~3，收益取决于接受率与回放开销
   code_agent_mode: true             # 🚀 Code Agent 专项加速模式 (低温确定性采样、工具闭合标签立即截断)
   default_temperature: 0.0          # 🚀 Code Agent 默认温度 (0.0 确定性输出使草稿命中率由 5.7% 跃升至 50%+)
 

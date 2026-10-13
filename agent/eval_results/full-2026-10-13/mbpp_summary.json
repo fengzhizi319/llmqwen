@@ -1,0 +1,414 @@
+{
+  "dataset": "mbpp",
+  "pass_at_1": 0.8146,
+  "passed": 334,
+  "total": 410,
+  "expected_total": 974,
+  "completed_generation_and_test": 410,
+  "infrastructure_errors": 0,
+  "missing": 564,
+  "complete": false,
+  "test_timeouts": 0,
+  "avg_elapsed_s": 10.49,
+  "avg_tps": 19.2,
+  "by_tier": {
+    "基础(id1-300)": {
+      "total": 300,
+      "pass": 241,
+      "elapsed": 2491.539999999999,
+      "tokens": 59498,
+      "pass_rate": 0.8033,
+      "tps": 23.9
+    },
+    "中级(id301-600)": {
+      "total": 110,
+      "pass": 93,
+      "elapsed": 1808.2499999999998,
+      "tokens": 23190,
+      "pass_rate": 0.8455,
+      "tps": 12.8
+    }
+  },
+  "failures": [
+    {
+      "uid": "mbpp_1",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_13",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_15",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_16",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_31",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_34",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_42",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_48",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_50",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_55",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_60",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_77",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_83",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_87",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_101",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_108",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_110",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_111",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_121",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_122",
+      "tier": "基础(id1-300)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 101)"
+    },
+    {
+      "uid": "mbpp_134",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_136",
+      "tier": "基础(id1-300)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 130)"
+    },
+    {
+      "uid": "mbpp_139",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_140",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_143",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_147",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_148",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_155",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_158",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_159",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_160",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_164",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_177",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_179",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_180",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_182",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_183",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_190",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_198",
+      "tier": "基础(id1-300)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 98)"
+    },
+    {
+      "uid": "mbpp_202",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_205",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_209",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_211",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_218",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_219",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_228",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_229",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_233",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_235",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_241",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_243",
+      "tier": "基础(id1-300)",
+      "err": "NameError: name 'sort_on_occurence' is not defined. Did you mean: 'sort_on_occurrence'?"
+    },
+    {
+      "uid": "mbpp_246",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_248",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_254",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_260",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_264",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_275",
+      "tier": "基础(id1-300)",
+      "err": "SyntaxError: invalid syntax"
+    },
+    {
+      "uid": "mbpp_276",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_289",
+      "tier": "基础(id1-300)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_303",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_304",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_310",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_312",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_313",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError: 2"
+    },
+    {
+      "uid": "mbpp_314",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_324",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_328",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_335",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_337",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_346",
+      "tier": "中级(id301-600)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 146)"
+    },
+    {
+      "uid": "mbpp_354",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_355",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_367",
+      "tier": "中级(id301-600)",
+      "err": "NameError: name 'Node' is not defined. Did you mean: 'None'?"
+    },
+    {
+      "uid": "mbpp_374",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_375",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_386",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    }
+  ]
+}

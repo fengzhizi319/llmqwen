@@ -1,0 +1,83 @@
+{
+  "dataset": "humaneval",
+  "pass_at_1": 0.9695,
+  "passed": 159,
+  "total": 164,
+  "expected_total": 164,
+  "completed_generation_and_test": 164,
+  "infrastructure_errors": 0,
+  "missing": 0,
+  "complete": true,
+  "test_timeouts": 0,
+  "avg_elapsed_s": 11.08,
+  "avg_tps": 21.6,
+  "by_tier": {
+    "算法与逻辑": {
+      "total": 37,
+      "pass": 36,
+      "elapsed": 471.73999999999995,
+      "tokens": 9561,
+      "pass_rate": 0.973,
+      "tps": 20.3
+    },
+    "字符串": {
+      "total": 20,
+      "pass": 20,
+      "elapsed": 204.19,
+      "tokens": 4342,
+      "pass_rate": 1.0,
+      "tps": 21.3
+    },
+    "数值与数学": {
+      "total": 25,
+      "pass": 25,
+      "elapsed": 233.42999999999995,
+      "tokens": 5306,
+      "pass_rate": 1.0,
+      "tps": 22.7
+    },
+    "其他": {
+      "total": 65,
+      "pass": 62,
+      "elapsed": 769.6400000000002,
+      "tokens": 16864,
+      "pass_rate": 0.9538,
+      "tps": 21.9
+    },
+    "列表与集合": {
+      "total": 17,
+      "pass": 16,
+      "elapsed": 137.7,
+      "tokens": 3131,
+      "pass_rate": 0.9412,
+      "tps": 22.7
+    }
+  },
+  "failures": [
+    {
+      "uid": "130",
+      "tier": "其他",
+      "err": "IndexError: list index out of range"
+    },
+    {
+      "uid": "132",
+      "tier": "列表与集合",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "140",
+      "tier": "其他",
+      "err": "AssertionError: This prints if this assert fails 3 (good for debugging!)"
+    },
+    {
+      "uid": "145",
+      "tier": "其他",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "163",
+      "tier": "算法与逻辑",
+      "err": "AssertionError: Test 1"
+    }
+  ]
+}

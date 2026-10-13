@@ -352,6 +352,11 @@ class MLXModelEngine(BaseModelEngine):
         流程: 加载模型 → 构建采样参数 → 调用 generate_fn → 提取文本 → stop 截断 → 更新统计
         """
         self.load_model()
+        # Use the same accelerated path and stop detection as streaming agents.
+        if self.code_agent_mode and self.stream_generate_fn is not None:
+            return "".join(self.stream_generate(
+                prompt, max_tokens, temperature, top_p, stop, **kwargs
+            ))
         gen_kwargs = self._build_sampler_kwargs(temperature, top_p, **kwargs)
         gen_kwargs["max_tokens"] = max_tokens
 
@@ -701,6 +706,8 @@ class MLXModelEngine(BaseModelEngine):
 
                 if text_chunk:
                     yield text_chunk
+                if stopped:
+                    break
 
             self._total_requests += 1
             if self.clear_cache_after_generation:

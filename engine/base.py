@@ -4,6 +4,8 @@ AI Code Service - 模型引擎抽象基类
 """
 
 import asyncio
+import concurrent.futures
+import threading
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Generator, AsyncGenerator, Optional, List, Union
 
@@ -76,45 +78,73 @@ class BaseModelEngine(ABC):
 
         支持 chunk_size 聚合：将多个 token 合并为一个 SSE 事件返回，减少网络开销。
         """
-        queue: asyncio.Queue = asyncio.Queue()
+        queue: asyncio.Queue = asyncio.Queue(maxsize=32)
         loop = asyncio.get_running_loop()
         done_sentinel = object()
+        cancelled = threading.Event()
         chunk_size = max(1, chunk_size)
 
+        def publish(item):
+            if cancelled.is_set():
+                return False
+            future = asyncio.run_coroutine_threadsafe(queue.put(item), loop)
+            while not cancelled.is_set():
+                try:
+                    future.result(timeout=0.1)
+                    return True
+                except concurrent.futures.TimeoutError:
+                    continue
+            future.cancel()
+            return False
+
         def _worker():
+            tokens = None
             try:
-                for token in self.stream_generate(
+                if cancelled.is_set():
+                    return
+                tokens = self.stream_generate(
                     prompt=prompt,
                     max_tokens=max_tokens,
                     temperature=temperature,
                     top_p=top_p,
                     stop=stop,
                     **kwargs,
-                ):
-                    loop.call_soon_threadsafe(queue.put_nowait, token)
+                )
+                buffer = []
+                for token in tokens:
+                    if cancelled.is_set():
+                        break
+                    buffer.append(token)
+                    if len(buffer) >= chunk_size:
+                        if not publish("".join(buffer)):
+                            break
+                        buffer.clear()
+                if buffer and not cancelled.is_set():
+                    publish("".join(buffer))
             except Exception as exc:
-                loop.call_soon_threadsafe(queue.put_nowait, exc)
+                publish(exc)
             finally:
-                loop.call_soon_threadsafe(queue.put_nowait, done_sentinel)
+                # Close on the producing thread to release engine locks safely.
+                try:
+                    if tokens is not None:
+                        tokens.close()
+                finally:
+                    publish(done_sentinel)
 
-        worker_task = asyncio.to_thread(_worker)
-        asyncio.create_task(worker_task)
-
-        buffer: List[str] = []
-        while True:
-            item = await queue.get()
-            if item is done_sentinel:
-                if buffer:
-                    yield "".join(buffer)
-                break
-            if isinstance(item, Exception):
-                if buffer:
-                    yield "".join(buffer)
-                raise item
-            buffer.append(item)
-            if len(buffer) >= chunk_size:
-                yield "".join(buffer)
-                buffer.clear()
+        worker_task = asyncio.create_task(asyncio.to_thread(_worker))
+        try:
+            while True:
+                item = await queue.get()
+                if item is done_sentinel:
+                    break
+                if isinstance(item, Exception):
+                    raise item
+                yield item
+        finally:
+            cancelled.set()
+            # Running inference cannot be interrupted mid-step; the worker exits
+            # at the next yielded token or queue timeout.
+            worker_task.cancel()
 
     def health_check(self) -> bool:
         """检查引擎可用性"""

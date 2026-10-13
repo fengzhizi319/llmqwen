@@ -1,0 +1,15 @@
+============================================================
+  🚀 AI Code Service 正在启动...
+  📌 默认模型: qwen3.8-flash-next-oq4e-mtp-128k
+  📌 配置模型列表: ['qwen3.8-flash-next-oq4e-mtp-128k']
+  📌 Mock 状态: 关闭 (实际模型推理模式)
+============================================================
+[Qwen4ExpEngine] 正在从本地路径 '/Users/charles/.cache/modelscope/models/jedisct1--Qwen3.8-Flash-Next-oQ4e-MTP-128k/snapshots/master' 加载模型 'qwen3.8-flash-next-oq4e-mtp-128k'...
+[Qwen4ExpEngine] 自定义模型代码与 MTP 支持已注册: /Users/charles/.cache/modelscope/models/jedisct1--Qwen3.8-Flash-Next-oQ4e-MTP-128k/snapshots/master/omlx_support
+[Qwen4ExpEngine] 已定位 omlx_support: /Users/charles/.cache/modelscope/models/jedisct1--Qwen3.8-Flash-Next-oQ4e-MTP-128k/snapshots/master/omlx_support
+[transformers] You are using a model of type `qwen4_exp` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+[Qwen4ExpEngine] ✅ 成功加载 Qwen4Exp 模型: qwen3.8-flash-next-oq4e-mtp-128k
+[Qwen4ExpEngine] 模型类型: mlx_lm.models.qwen4_exp.Model
+[Qwen4ExpEngine] 🚀 MTP 多 Token 投机推测已就绪 (深度: 3，完整状态验证已启用)
+[Startup] 默认模型 qwen3.8-flash-next-oq4e-mtp-128k 已预热
+  👋 AI Code Service 已安全关闭

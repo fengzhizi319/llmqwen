@@ -5,7 +5,7 @@ AI Code Service - Qwen4Exp (Flash-Next) 高性能推理引擎
   - Qwen4Exp 架构支持: 混合线性/全注意力层 (linear_attention + full_attention)、
     PLE 渐进层嵌入、HyperConnection 超连接、SwitchGLU MoE 专家混合
   - oQ4e 混合精度量化: 3-bit/4-bit/8-bit 自适应量化，大幅压缩模型体积
-  - 内置 MTP 推测解码: 模型自带 MoE MTP 层，mlx_lm 原生支持
+  - 内置 MTP 推测解码: 模型自带 MoE MTP 层，本引擎执行位置对齐验证与完整状态重放
   - 自定义模型代码注册: 通过 omlx_support 补丁将 qwen4_exp 模型类型注入 mlx_lm
   - Thinking 模式处理: 自动识别并可选剥离 <think>...</think> 思考链输出
   - 128K 超长上下文: 支持 131,072 tokens 上下文窗口
@@ -28,6 +28,7 @@ import time
 from typing import Generator, Optional, List, Union, Dict, Any
 
 from .base import BaseModelEngine
+from .prefix_cache import PrefixSnapshotCache
 
 
 # ── 全局自定义模型代码注册标志 (单例模式，仅注册一次) ──
@@ -131,7 +132,7 @@ class Qwen4ExpEngine(BaseModelEngine):
 
     与 MLXModelEngine 的关键差异:
       - 架构类型: qwen4_exp (非 qwen3_5)，需要自定义模型代码注入
-      - MTP 策略: 模型内置 MoE MTP 层，由 mlx_lm 原生处理，无需外部 MTP 头
+      - MTP 策略: 模型内置 MoE MTP 层，本引擎进行贪婪验证，无需外部 MTP 头
       - Thinking 模式: 模型默认输出 <think>...</think> 思考链，支持可选剥离
       - 内存占用: ~93GB 峰值内存 (18 分片 + MTP 专家权重)
 
@@ -149,10 +150,12 @@ class Qwen4ExpEngine(BaseModelEngine):
         prefill_step_size: int = 2048,          # 分块预填充步长
         enable_prompt_cache: bool = True,       # 是否启用 prompt KV cache 复用
         enable_mtp: bool = True,                # 🚀 是否启用 MTP (Multi-Token Prediction) 多 Token 投机推测
-        mtp_depth: int = 3,                     # 🚀 MTP 解码深度 (1~3，针对代码高可预测性冲刺 135+ tok/s)
+        mtp_depth: int = 3,                     # MTP 草稿深度 (1~3)，收益取决于接受率
         code_agent_mode: bool = True,           # 🚀 Code Agent 专项加速模式 (低温确定性、前缀持久化、工具截断)
         strip_thinking: bool = False,           # 是否剥离 <think>...</think> 思考链输出
         enable_thinking: bool = True,           # 是否启用 thinking 模式 (传入 chat template)
+        prompt_cache_max_entries: int = 4,
+        prompt_cache_max_tokens: int = 8192,
     ):
         # ── 配置参数 ──
         self.model_name = model_name
@@ -181,10 +184,15 @@ class Qwen4ExpEngine(BaseModelEngine):
         self.omlx_support_path = None   # omlx_support 自定义代码路径
 
         # ── Code Agent 会话级持久化 Prompt 前缀 KV Cache ──
-        self._cached_prompt_tokens: Optional[List[int]] = None
-        self._cached_prompt_cache: Optional[Any] = None
-        self._cached_prompt_mtp_cache: Optional[Any] = None
-        self._prefix_cache_hits = 0
+        self._prefix_cache = PrefixSnapshotCache(
+            prompt_cache_max_entries, prompt_cache_max_tokens
+        )
+        self._last_reused_tokens = 0
+        self._last_prefill_tokens = 0
+        self._last_prompt_token_count = 0
+        self._last_prefill_seconds = 0.0
+        self._mtp_drafted_tokens = 0
+        self._mtp_accepted_tokens = 0
 
         # ── 性能统计指标 ──
         self._total_requests = 0
@@ -260,7 +268,7 @@ class Qwen4ExpEngine(BaseModelEngine):
                 print(f"[Qwen4ExpEngine] ✅ 成功加载 Qwen4Exp 模型: {self.model_name}")
                 print(f"[Qwen4ExpEngine] 模型类型: {type(self.model).__module__}.{type(self.model).__name__}")
                 if self.has_mtp and self.enable_mtp:
-                    print(f"[Qwen4ExpEngine] 🚀 MTP 多 Token 投机推测已就绪 (深度: {self.mtp_depth}，预计吞吐翻倍)")
+                    print(f"[Qwen4ExpEngine] 🚀 MTP 多 Token 投机推测已就绪 (深度: {self.mtp_depth}，完整状态验证已启用)")
                 else:
                     print(f"[Qwen4ExpEngine] ℹ️ 标准串行解码模式运行")
             except Exception as e:
@@ -288,6 +296,65 @@ class Qwen4ExpEngine(BaseModelEngine):
     def count_tokens(self, text: str) -> int:
         return self._cached_count_tokens(text)
 
+    def _prepare_prefix(self, prompt, tokenizer):
+        """Restore an exact prefill checkpoint, then process only the suffix.
+
+        Must run under self.lock on the MLX generation stream. Snapshots are
+        taken before decoding, including all four ArraysCache states and QSA
+        index keys. No generated token or speculative state enters the cache.
+        """
+        import mlx.core as mx
+
+        add_bos = tokenizer.bos_token is None or not prompt.startswith(tokenizer.bos_token)
+        tokens = tokenizer.encode(prompt, add_special_tokens=add_bos)
+        if not tokens:
+            raise ValueError("Prompt must contain at least one token")
+        started = time.perf_counter()
+        state, reused = self._prefix_cache.restore(tokens) if self.enable_prompt_cache else (None, 0)
+        state = state if state is not None else self.model.make_cache()
+        target = len(tokens) - 1
+        # Retain the stable system/tool declaration boundary as well as the
+        # most recent bounded prompt. This also helps branched conversations.
+        boundaries = {target}
+        cap = self._prefix_cache.max_tokens
+        if self.enable_prompt_cache and 0 < cap < target:
+            boundaries.add(cap)
+        marker = "<|im_end|>"
+        if self.enable_prompt_cache and prompt.startswith("<|im_start|>system\n") and marker in prompt:
+            system_text = prompt[:prompt.index(marker) + len(marker)]
+            system_tokens = tokenizer.encode(system_text, add_special_tokens=add_bos)
+            if tokens[:len(system_tokens)] == system_tokens and len(system_tokens) <= min(cap, target):
+                boundaries.add(len(system_tokens))
+        processed = reused
+        for boundary in sorted(boundaries):
+            if boundary <= processed:
+                continue
+            while processed < boundary:
+                end = min(boundary, processed + max(1, self.prefill_step_size))
+                self.model(mx.array(tokens[processed:end], dtype=mx.uint32)[None], cache=state)
+                mx.eval([layer.state for layer in state])
+                processed = end
+            if self.enable_prompt_cache:
+                self._prefix_cache.store(tokens[:processed], state)
+        self._last_prompt_token_count = len(tokens)
+        self._last_reused_tokens = reused
+        self._last_prefill_tokens = target - reused
+        self._last_prefill_seconds = time.perf_counter() - started
+        return state, tokens[processed:], tokens
+
+    def _prepare_native_stream(self, prompt):
+        import mlx.core as mx
+        from mlx_lm.generate import generation_stream
+        from mlx_lm.tokenizer_utils import TokenizerWrapper
+
+        tokenizer = self.tokenizer
+        if not isinstance(tokenizer, TokenizerWrapper):
+            tokenizer = TokenizerWrapper(tokenizer)
+        tokenizer.detokenizer.reset()
+        with mx.stream(generation_stream):
+            state, remaining, _ = self._prepare_prefix(prompt, tokenizer)
+        return tokenizer, remaining, state
+
     def _build_sampler_kwargs(self, temperature: float, top_p: float, **kwargs) -> Dict[str, Any]:
         """构建采样器参数
 
@@ -295,7 +362,7 @@ class Qwen4ExpEngine(BaseModelEngine):
 
         注意: Qwen4Exp 架构使用自定义缓存 (QSAKVCache / PLE 嵌入缓存)，
         不支持标准 KV Cache 量化 (kv_bits/kv_group_size)。
-        因此不注入 kv_bits/kv_group_size/prefill_step_size 参数，
+        因此不注入 kv_bits/kv_group_size 参数，分块预填充由本引擎处理，
         避免 generate_step 尝试量化自定义缓存导致输出异常。
         """
         gen_kwargs: Dict[str, Any] = {}
@@ -321,7 +388,7 @@ class Qwen4ExpEngine(BaseModelEngine):
                     repetition_context_size=rep_ctx,
                 )
 
-            # 注意: Qwen4Exp 不支持标准 KV Cache 量化，不注入 kv_bits/kv_group_size
+            # 自定义缓存不注入 kv_bits/kv_group_size；分块预填充由 _prepare_prefix 处理。
 
         except Exception:
             gen_kwargs["temp"] = temperature
@@ -362,6 +429,11 @@ class Qwen4ExpEngine(BaseModelEngine):
               → thinking 标签处理 → stop 截断 → 更新统计
         """
         self.load_model()
+        # Use the same accelerated path and stop detection as streaming agents.
+        if self.code_agent_mode and self.stream_generate_fn is not None:
+            return "".join(self.stream_generate(
+                prompt, max_tokens, temperature, top_p, stop, **kwargs
+            ))
         gen_kwargs = self._build_sampler_kwargs(temperature, top_p, **kwargs)
         gen_kwargs["max_tokens"] = max_tokens
 
@@ -406,22 +478,15 @@ class Qwen4ExpEngine(BaseModelEngine):
             return result
 
     def _stream_generate_mtp(
-        self,
-        prompt: str,
-        max_tokens: int,
-        temperature: float,
-        stop_list: List[str],
-        gen_kwargs: Dict[str, Any],
+        self, prompt, max_tokens, temperature, stop_list, gen_kwargs,
     ) -> Generator[str, None, None]:
-        """MTP 多 Token 投机推测解码引擎 (支持深度 1~3，针对代码生成进行极限吞吐加速)
+        """Greedy MTP with correctly aligned verification and full-state replay.
 
-        算法流程:
-          1. 前缀缓存匹配: 比对当前 prompt 与上次请求的前缀，复用常驻 KV Cache (<5ms TTFT)
-          2. 分块增量预填充: 仅前向计算新增差量 Token
-          3. MTP 深度投机: MTP 辅助层前瞻产出 K 个候选 token (K <= mtp_depth)
-          4. 骨干并行校验: 主模型单次矩阵运算校验全部 K 个候选 token
-          5. 确定性回滚: 若命中全部接受，若分歧回滚至主模型真实预测，保证 100% 数学精确
+        Verification inputs are [current, draft_0, ...], so logits[j] predicts
+        draft[j]. Rejected speculative states are discarded in their entirety;
+        replay restores recurrent, PLE and QSA state without partial trimming.
         """
+        import copy
         import mlx.core as mx
         from mlx_lm.generate import generation_stream
         from mlx_lm.tokenizer_utils import TokenizerWrapper
@@ -429,206 +494,117 @@ class Qwen4ExpEngine(BaseModelEngine):
         tokenizer = self.tokenizer
         if not isinstance(tokenizer, TokenizerWrapper):
             tokenizer = TokenizerWrapper(tokenizer)
-
-        add_bos = tokenizer.bos_token is None or not prompt.startswith(tokenizer.bos_token)
-        prompt_tokens = tokenizer.encode(prompt, add_special_tokens=add_bos)
-        if not prompt_tokens:
-            return
-
-        sampler = gen_kwargs.get("sampler")
-        if temperature <= 0.05 or sampler is None:
-            sample_fn = lambda lgt: mx.argmax(lgt, axis=-1)
-        else:
-            sample_fn = sampler
-
         with self.lock, mx.stream(generation_stream):
-            # ── 阶段 1: 初始化纯净 KV Cache (避免混合线性注意力层历史状态污染) ──
-            main_cache = self.model.make_cache()
-            mtp_cache = self.model.make_mtp_cache() if hasattr(self.model, "make_mtp_cache") else None
-            common_len = 0
-
-            # ── 阶段 2: Prefill 增量/全量预填充 ──
-            tokens_to_prefill = prompt_tokens[common_len:]
-            if not tokens_to_prefill:
-                tokens_to_prefill = prompt_tokens[-1:]
-
-            t_start = time.perf_counter()
-            prefill_arr = mx.array(tokens_to_prefill, dtype=mx.uint32)[None]
-            prefill_logits, prefill_hidden = self.model(prefill_arr, cache=main_cache, return_hidden=True)
-            mx.eval(prefill_logits, prefill_hidden)
-            t_ttft = time.perf_counter() - t_start
-
-            if t_ttft > 0:
-                self._last_prompt_tps = round(len(prompt_tokens) / t_ttft, 2)
-
-            current_token = sample_fn(prefill_logits[:, -1, :])
-            current_hidden = prefill_hidden[:, -1:, :]
-            mx.eval(current_token)
-
+            started = time.perf_counter()
+            main_cache, remaining, prompt_tokens = self._prepare_prefix(prompt, tokenizer)
+            logits, hidden = self.model(
+                mx.array(remaining, dtype=mx.uint32)[None],
+                cache=main_cache, return_hidden=True,
+            )
+            current = mx.argmax(logits[:, -1, :], axis=-1)
+            current_hidden = hidden[:, -1:, :]
+            mx.eval(current, current_hidden)
+            self._last_prompt_tps = round(
+                (self._last_prefill_tokens + len(remaining)) / max(time.perf_counter() - started, 1e-9), 2
+            )
             detokenizer = tokenizer.detokenizer
             detokenizer.reset()
-
-            first_tok_id = current_token.item()
-            if first_tok_id in tokenizer.eos_token_ids:
-                return
-
-            detokenizer.add_token(first_tok_id)
-            first_text = detokenizer.last_segment
-            accumulated = first_text
-
+            accumulated = ""
+            generated = 0
             stopped = False
-            for s in stop_list:
-                if s in accumulated:
+            gen_started = time.perf_counter()
+
+            def emit(token_id):
+                nonlocal accumulated, generated, stopped
+                if token_id in tokenizer.eos_token_ids:
                     stopped = True
-                    cutoff_index = accumulated.find(s)
-                    first_text = first_text[:cutoff_index]
-                    break
+                    return ""
+                generated += 1
+                detokenizer.add_token(token_id)
+                text = detokenizer.last_segment
+                accumulated += text
+                positions = [accumulated.find(s) for s in stop_list if s and s in accumulated]
+                if positions:
+                    stopped = True
+                    cutoff = min(positions)
+                    text = text[:max(0, len(text) - (len(accumulated) - cutoff))]
+                return text if not self.strip_thinking else ""
 
-            if first_text and not self.strip_thinking:
-                yield first_text
-
-            n_generated = 1
-            gen_start = time.perf_counter()
-            depth_k = max(1, min(self.mtp_depth, 3))
-
-            # ── 阶段 3: MTP 深度投机推测生成循环 ──
-            while n_generated < max_tokens and not stopped:
-                if current_token.item() in tokenizer.eos_token_ids:
-                    break
-
-                draft_tokens = []
-                d_hidden = current_hidden
-                d_tok = current_token
-
-                # MTP 辅助层前瞻预测 depth_k 个 Draft Tokens
-                for _ in range(min(depth_k, max_tokens - n_generated)):
-                    try:
-                        d_logits, d_next_hidden = self.model.mtp_forward(
-                            d_hidden,
-                            d_tok[None],
-                            mtp_cache=mtp_cache,
-                            return_hidden=True,
-                        )
-                        cand = sample_fn(d_logits[:, -1, :])
-                        mx.eval(cand)
-                        cand_id = cand.item()
-                        draft_tokens.append(cand)
-                        if cand_id in tokenizer.eos_token_ids:
-                            break
-                        d_hidden = d_next_hidden
-                        d_tok = cand
-                    except Exception:
+            text = emit(current.item())
+            if text:
+                yield text
+            while generated < max_tokens and not stopped:
+                # Draft head state is speculative and is never persisted across
+                # cycles or requests. Only backbone-approved tokens are emitted.
+                draft_cache = self.model.make_mtp_cache()
+                draft_hidden, draft_token = current_hidden, current
+                drafts = []
+                for _ in range(min(max(1, min(self.mtp_depth, 3)), max_tokens - generated)):
+                    d_logits, draft_hidden = self.model.mtp_forward(
+                        draft_hidden, draft_token.reshape(1, 1),
+                        mtp_cache=draft_cache, return_hidden=True,
+                    )
+                    draft_token = mx.argmax(d_logits[:, -1, :], axis=-1)
+                    mx.eval(draft_token)
+                    drafts.append(draft_token.item())
+                    if drafts[-1] in tokenizer.eos_token_ids:
                         break
 
-                if not draft_tokens:
-                    # 单 token 回退
-                    single_arr = current_token[None, None]
-                    out_logits, out_hidden = self.model(single_arr, cache=main_cache, return_hidden=True)
-                    current_token = sample_fn(out_logits[:, -1, :])
-                    current_hidden = out_hidden[:, -1:, :]
-                    mx.eval(current_token)
-                    tok_id = current_token.item()
-                    if tok_id in tokenizer.eos_token_ids:
-                        break
-                    detokenizer.add_token(tok_id)
-                    chunk = detokenizer.last_segment
-                    accumulated += chunk
-                    for s in stop_list:
-                        if s in accumulated:
-                            stopped = True
-                            cutoff = accumulated.find(s)
-                            chunk = chunk[:len(chunk) - (len(accumulated) - cutoff)]
-                            break
-                    if chunk and not self.strip_thinking:
-                        yield chunk
-                    n_generated += 1
-                    continue
-
-                # 主模型单步并行验证全部 Draft Tokens
-                draft_batch = mx.array([t.item() for t in draft_tokens], dtype=mx.uint32)[None]
-                verif_logits, verif_hidden = self.model(draft_batch, cache=main_cache, return_hidden=True)
-                mx.eval(verif_logits, verif_hidden)
-
-                num_drafts = len(draft_tokens)
+                before = copy.deepcopy(main_cache)
+                inputs = [current.item()] + drafts
+                v_logits, v_hidden = self.model(
+                    mx.array(inputs, dtype=mx.uint32)[None],
+                    cache=main_cache, return_hidden=True,
+                )
+                predictions = mx.argmax(v_logits, axis=-1)
+                mx.eval(predictions, v_hidden)
+                predictions = predictions[0].tolist()
                 accepted = 0
-
-                for j in range(num_drafts):
-                    gt_token = sample_fn(verif_logits[:, j, :])
-                    mx.eval(gt_token)
-                    gt_id = gt_token.item()
-                    draft_id = draft_tokens[j].item()
-
-                    if gt_id == draft_id:
-                        accepted += 1
-                        current_token = draft_tokens[j]
-                        current_hidden = verif_hidden[:, j:j+1, :]
-                        n_generated += 1
-
-                        if gt_id in tokenizer.eos_token_ids:
-                            stopped = True
-                            break
-
-                        detokenizer.add_token(gt_id)
-                        chunk = detokenizer.last_segment
-                        accumulated += chunk
-                        for s in stop_list:
-                            if s in accumulated:
-                                stopped = True
-                                cutoff = accumulated.find(s)
-                                chunk = chunk[:len(chunk) - (len(accumulated) - cutoff)]
-                                break
-                        if chunk and not self.strip_thinking:
-                            yield chunk
-                        if stopped or n_generated >= max_tokens:
-                            break
-                    else:
-                        current_token = gt_token
-                        current_hidden = verif_hidden[:, j:j+1, :]
-                        n_generated += 1
-
-                        if hasattr(self.model, "mtp_partial_rollback"):
-                            self.model.mtp_partial_rollback(main_cache, accepted, num_drafts)
-
-                        if gt_id in tokenizer.eos_token_ids:
-                            stopped = True
-                            break
-
-                        detokenizer.add_token(gt_id)
-                        chunk = detokenizer.last_segment
-                        accumulated += chunk
-                        for s in stop_list:
-                            if s in accumulated:
-                                stopped = True
-                                cutoff = accumulated.find(s)
-                                chunk = chunk[:len(chunk) - (len(accumulated) - cutoff)]
-                                break
-                        if chunk and not self.strip_thinking:
-                            yield chunk
+                for draft, predicted in zip(drafts, predictions):
+                    if draft != predicted:
                         break
+                    accepted += 1
+                self._mtp_drafted_tokens += len(drafts)
+                self._mtp_accepted_tokens += accepted
 
-            # ── 阶段 4: 统计与持久化前缀缓存 ──
-            gen_duration = time.perf_counter() - gen_start
-            if gen_duration > 0 and n_generated > 1:
-                self._last_generation_tps = round(n_generated / gen_duration, 2)
-                self._generation_times.append(gen_duration)
+                if accepted < len(drafts):
+                    main_cache = before
+                    _, replay_hidden = self.model(
+                        mx.array(inputs[:accepted + 1], dtype=mx.uint32)[None],
+                        cache=main_cache, return_hidden=True,
+                    )
+                    mx.eval([layer.state for layer in main_cache], replay_hidden)
+                    current_hidden = replay_hidden[:, -1:, :]
+                else:
+                    current_hidden = v_hidden[:, -1:, :]
+                # Accepted drafts plus one authoritative backbone prediction.
+                approved = drafts[:accepted] + [predictions[accepted]]
+                current = mx.array([approved[-1]], dtype=mx.uint32)
+                for token_id in approved:
+                    if generated >= max_tokens or stopped:
+                        break
+                    text = emit(token_id)
+                    if text:
+                        yield text
 
-            self._total_requests += 1
-            self._total_prompt_tokens += len(prompt_tokens)
-            self._total_generation_tokens += n_generated
-
-            if self.enable_prompt_cache:
-                self._cached_prompt_tokens = prompt_tokens
-                self._cached_prompt_cache = None
-                self._cached_prompt_mtp_cache = None
-
+            detokenizer.finalize()
+            tail = detokenizer.last_segment
+            if tail and not stopped:
+                accumulated += tail
+                if not self.strip_thinking:
+                    yield tail
             if self.strip_thinking:
                 final_text = self._strip_thinking_tags(accumulated)
-                for s in stop_list:
-                    if s in final_text:
-                        final_text = final_text.split(s)[0]
+                for stop in stop_list:
+                    if stop:
+                        final_text = final_text.split(stop)[0]
                 if final_text:
                     yield final_text
-
+            duration = time.perf_counter() - gen_started
+            self._last_generation_tps = round(generated / max(duration, 1e-9), 2)
+            self._total_requests += 1
+            self._total_prompt_tokens += len(prompt_tokens)
+            self._total_generation_tokens += generated
             if self.clear_cache_after_generation:
                 self._clear_metal_cache()
 
@@ -644,7 +620,7 @@ class Qwen4ExpEngine(BaseModelEngine):
         """流式生成: 支持 MTP 多 Token 投机推测、提示词前缀 KV Cache 复用与 Code Agent 极速采样"""
         self.load_model()
 
-        # Code Agent 模式优化: 当采样温度 <= 0.2 时启用确定性贪婪采样，使 MTP 草稿接受率从 5.7% 提升至 50%+
+        # Code Agent 模式优化: 当采样温度 <= 0.2 时启用确定性贪婪采样
         eff_temp = float(temperature)
         if self.code_agent_mode and eff_temp <= 0.2:
             eff_temp = 0.0
@@ -653,19 +629,15 @@ class Qwen4ExpEngine(BaseModelEngine):
         gen_kwargs["max_tokens"] = max_tokens
         stop_list = [stop] if isinstance(stop, str) else (stop or [])
 
-        # ── 路径 1: MTP 多 Token 投机推测加速路径 (135+ tok/s) ──
-        if self.has_mtp and self.enable_mtp and self.mtp_depth > 0:
-            try:
-                yield from self._stream_generate_mtp(
-                    prompt=prompt,
-                    max_tokens=max_tokens,
-                    temperature=eff_temp,
-                    stop_list=stop_list,
-                    gen_kwargs=gen_kwargs,
-                )
-                return
-            except Exception as e:
-                print(f"[Qwen4ExpEngine] ⚠️ MTP 投机推测回退至标准流式: {e}")
+        # ── 路径 1: 贪婪 MTP，多 Token 验证与完整状态重放 ──
+        # Stochastic speculative sampling needs acceptance/rejection correction;
+        # use native sampling until that algorithm is implemented.
+        if (self.has_mtp and self.enable_mtp and self.mtp_depth > 0
+                and eff_temp == 0.0 and not gen_kwargs.get("logits_processors")):
+            yield from self._stream_generate_mtp(
+                prompt, max_tokens, eff_temp, stop_list, gen_kwargs
+            )
+            return
 
         # ── 降级路径: 无流式生成函数 → 非流式 → 逐字符 yield ──
         if not self.stream_generate_fn:
@@ -676,16 +648,17 @@ class Qwen4ExpEngine(BaseModelEngine):
 
         # ── 路径 2: mlx_lm 原生流式生成 ──
         with self.lock:
+            tokenizer, remaining_tokens, main_cache = self._prepare_native_stream(prompt)
+            gen_kwargs["prompt_cache"] = main_cache
+            gen_kwargs["prefill_step_size"] = max(1, self.prefill_step_size)
             stop_list = [stop] if isinstance(stop, str) else (stop or [])
 
             accumulated = ""
             stopped = False
 
-            # Thinking 状态机: 追踪是否在 <think> 块内部
-            in_thinking = self.strip_thinking  # 如果需要剥离，初始假设可能在思考块中
-            think_tag_pos = 0  # 已扫描到的位置
+            generation_tokens = 0
 
-            for response in self.stream_generate_fn(self.model, self.tokenizer, prompt, **gen_kwargs):
+            for response in self.stream_generate_fn(self.model, tokenizer, remaining_tokens, **gen_kwargs):
                 if stopped:
                     break
 
@@ -694,18 +667,15 @@ class Qwen4ExpEngine(BaseModelEngine):
 
                 # 采集 MLX 引擎内部报告的 TPS 指标
                 if hasattr(response, "prompt_tps") and response.prompt_tps:
-                    self._last_prompt_tps = round(float(response.prompt_tps), 2)
+                    prefill_duration = self._last_prefill_seconds + len(remaining_tokens) / float(response.prompt_tps)
+                    self._last_prompt_tps = round(
+                        (self._last_prefill_tokens + len(remaining_tokens)) / max(prefill_duration, 1e-9), 2
+                    )
                 if hasattr(response, "generation_tps") and response.generation_tps:
                     self._last_generation_tps = round(float(response.generation_tps), 2)
 
-                # ── Thinking 模式流式过滤 ──
-                if self.strip_thinking:
-                    # 简化策略: 累积全部文本，检测 <think>...</think> 块
-                    # 一旦 </think> 出现，仅输出其后的内容
-                    accumulated += text_chunk
-                    continue
-                else:
-                    accumulated += text_chunk
+                generation_tokens = getattr(response, "generation_tokens", generation_tokens)
+                accumulated += text_chunk
 
                 # Stop 字符串截断检测
                 for s in stop_list:
@@ -715,8 +685,10 @@ class Qwen4ExpEngine(BaseModelEngine):
                         text_chunk = text_chunk[:len(text_chunk) - (len(accumulated) - cutoff_index)]
                         break
 
-                if text_chunk:
+                if text_chunk and not self.strip_thinking:
                     yield text_chunk
+                if stopped:
+                    break
 
             # ── Thinking 模式: 后处理剥离 ──
             if self.strip_thinking:
@@ -732,6 +704,8 @@ class Qwen4ExpEngine(BaseModelEngine):
                 pass
 
             self._total_requests += 1
+            self._total_prompt_tokens += self._last_prompt_token_count
+            self._total_generation_tokens += generation_tokens
             if self.clear_cache_after_generation:
                 self._clear_metal_cache()
 
@@ -775,8 +749,14 @@ class Qwen4ExpEngine(BaseModelEngine):
             "has_mtp": self.has_mtp,
             "enable_mtp": self.enable_mtp,
             "mtp_depth": self.mtp_depth,
+            "mtp_drafted_tokens": self._mtp_drafted_tokens,
+            "mtp_accepted_tokens": self._mtp_accepted_tokens,
             "code_agent_mode": self.code_agent_mode,
-            "prefix_cache_hits": self._prefix_cache_hits,
+            "prefix_cache_hits": self._prefix_cache.hits,
+            "prefix_cache": self._prefix_cache.stats(),
+            "last_reused_tokens": self._last_reused_tokens,
+            "last_prefill_tokens": self._last_prefill_tokens,
+            "last_prefill_seconds": round(self._last_prefill_seconds, 6),
             "resolved_path": self.resolved_path,
             "kv_bits": self.kv_bits,
             "prefill_step_size": self.prefill_step_size,
@@ -809,6 +789,10 @@ class Qwen4ExpEngine(BaseModelEngine):
             self.generate_fn = None
             self.stream_generate_fn = None
             self._loaded = False
+            self._prefix_cache.clear()
+            self._last_reused_tokens = self._last_prefill_tokens = 0
+            self._last_prompt_token_count = 0
+            self._last_prefill_seconds = 0.0
             self._cached_count_tokens.cache_clear()
         self._clear_metal_cache()
         import gc

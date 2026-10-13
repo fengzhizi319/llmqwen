@@ -121,3 +121,30 @@ def test_stream_chunk_aggregation():
     triple_chunks = asyncio.run(collect_chunks(3))
     assert "".join(triple_chunks) == full_text
     assert len(triple_chunks) <= len(single_chunks)
+
+
+@pytest.mark.parametrize("endpoint,payload", [
+    ("/v1/chat/completions", {"messages": [{"role": "user", "content": "hello"}]}),
+    ("/v1/completions", {"prompt": "def add(a, b):"}),
+])
+def test_cache_separates_output_limits(client, endpoint, payload):
+    payload = {**payload, "model": TEST_MODEL_NAME, "max_tokens": 8}
+    assert client.post(endpoint, json=payload).headers["X-Cache"] == "MISS"
+    payload["max_tokens"] = 32
+    assert client.post(endpoint, json=payload).headers["X-Cache"] == "MISS"
+    assert client.post(endpoint, json=payload).headers["X-Cache"] == "HIT"
+
+
+def test_cache_preserves_sampling_precision():
+    first = ResponseCache.generate_key("chat", "model", "prompt", temperature=0.101)
+    second = ResponseCache.generate_key("chat", "model", "prompt", temperature=0.104)
+    assert first != second
+
+
+def test_cache_ttl_uses_monotonic_clock(monkeypatch):
+    now = [100.0]
+    monkeypatch.setattr("engine.cache.time.monotonic", lambda: now[0])
+    cache = ResponseCache(ttl_seconds=10)
+    cache.set("key", "value")
+    now[0] = 111.0
+    assert cache.get("key") is None

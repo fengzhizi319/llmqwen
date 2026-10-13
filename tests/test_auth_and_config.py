@@ -42,3 +42,39 @@ def test_public_path_without_auth(auth_client):
     # 公开路径在配置了 API Key 时依然可以直接访问
     res = auth_client.get("/health")
     assert res.status_code == 200
+
+
+def test_environment_overrides_yaml(tmp_path, monkeypatch):
+    from config import load_config
+
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        "server:\n  api_key: yaml-key\ndefault_model: yaml-model\nuse_mock: false\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("API_KEY", "env-key")
+    monkeypatch.setenv("DEFAULT_MODEL", "env-model")
+    monkeypatch.setenv("USE_MOCK", "true")
+    config = load_config(str(config_path))
+    assert config.server.api_key == "env-key"
+    assert config.default_model == "env-model"
+    assert config.use_mock is True
+
+
+def test_default_config_loads_outside_project(tmp_path, monkeypatch):
+    from pathlib import Path
+    import config
+
+    monkeypatch.chdir(tmp_path)
+    assert config.load_config().models == config.load_config(
+        str(Path(config.__file__).parent / "config.yaml")
+    ).models
+
+
+def test_zero_concurrency_is_rejected():
+    import pytest
+    from pydantic import ValidationError
+    from config import PerformanceConfig
+
+    with pytest.raises(ValidationError):
+        PerformanceConfig(max_concurrency=0)
