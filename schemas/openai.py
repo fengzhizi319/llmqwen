@@ -8,10 +8,23 @@ from typing import List, Optional, Union, Dict, Any
 from pydantic import BaseModel, Field
 
 
+class ToolCallFunction(BaseModel):
+    name: str
+    arguments: str = ""
+
+
+class ToolCall(BaseModel):
+    id: str = ""
+    type: str = "function"
+    function: ToolCallFunction
+
+
 class ChatMessage(BaseModel):
-    role: str = Field(..., description="消息角色: system, user, assistant")
-    content: str = Field(..., description="消息文本内容")
+    role: str = Field(..., description="消息角色: system, user, assistant, tool")
+    content: Optional[str] = Field(default=None, description="消息文本内容")
     name: Optional[str] = None
+    tool_call_id: Optional[str] = None
+    tool_calls: Optional[List[ToolCall]] = None
 
 
 class ChatCompletionRequest(BaseModel):
@@ -19,7 +32,7 @@ class ChatCompletionRequest(BaseModel):
     messages: Optional[List[ChatMessage]] = None
     input: Optional[Union[str, List[Any]]] = None
     instructions: Optional[str] = None
-    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
+    temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
     top_p: float = Field(default=0.9, ge=0.0, le=1.0)
     max_tokens: Optional[int] = Field(default=2048, ge=1, le=262144)
     max_output_tokens: Optional[int] = Field(default=None, ge=1, le=262144)
@@ -29,6 +42,9 @@ class ChatCompletionRequest(BaseModel):
     presence_penalty: float = 0.0
     frequency_penalty: float = 0.0
     user: Optional[str] = None
+    tools: Optional[List[Dict[str, Any]]] = Field(default=None, description="OpenAI 格式工具定义列表")
+    tool_choice: Optional[Union[str, Dict[str, Any]]] = Field(default=None, description="auto/none/required 或指定工具")
+    enable_thinking: Optional[bool] = Field(default=None, description="是否启用思考块，false 时注入空 think 标签")
 
 
 class CompletionRequest(BaseModel):
@@ -36,7 +52,7 @@ class CompletionRequest(BaseModel):
     prompt: Optional[Union[str, List[str]]] = ""
     suffix: Optional[str] = Field(default=None, description="FIM 补全的后缀代码 (Suffix)")
     max_tokens: Optional[int] = Field(default=512, ge=1, le=262144)
-    temperature: float = Field(default=0.2, ge=0.0, le=2.0)
+    temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
     top_p: float = Field(default=0.95, ge=0.0, le=1.0)
     stream: bool = False
     stop: Optional[Union[str, List[str]]] = None

@@ -20,6 +20,8 @@ from .openai import (
     CodeReviewRequest,
     CodeDocstringRequest,
     UsageInfo,
+    ToolCall,
+    ToolCallFunction,
 )
 
 __all__ = [
@@ -41,4 +43,6 @@ __all__ = [
     "CodeReviewRequest",
     "CodeDocstringRequest",
     "UsageInfo",
+    "ToolCall",
+    "ToolCallFunction",
 ]

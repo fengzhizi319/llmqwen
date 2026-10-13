@@ -47,6 +47,8 @@ llmqwen/
 │   ├── start-all.sh           # 一键启动后端 + 前端
 │   ├── start-backend.sh       # 启动 Python LLM 后端
 │   ├── start-frontend.sh      # 启动 Go Web 前端网关
+│   ├── install-opencode.sh    # 下载并安装 opencode code agent
+│   ├── start-agent.sh         # 一键启动 opencode Code Agent 服务
 │   ├── stop-all.sh            # 停止所有服务
 │   ├── test-mock.sh           # Mock 单元测试
 │   ├── test-real.sh           # 真实模型集成测试
@@ -105,6 +107,9 @@ llmqwen/
     │       ├── style.css      # 样式表
     │       └── app.js         # 前端逻辑 (SSE 流式 + 模型切换 + 性能指标)
     └── dist/                  # Vite 构建输出 (Go embed 嵌入)
+└── agent/                     # opencode Code Agent 模块
+    ├── opencode.json.template # opencode 配置模板 (指向本地 LLM 后端)
+    └── opencode.json          # 生成的运行时配置 (已 gitignore)
 ```
 
 ---
@@ -250,6 +255,8 @@ cp .env.example .env
 | `scripts/start-backend.sh` | 仅启动 Python LLM 后端 | `./scripts/start-backend.sh` |
 | `scripts/start-frontend.sh` | 启动 Go Web 前端 (生产) | `./scripts/start-frontend.sh` |
 | `scripts/start-frontend.sh --dev` | 启动 Vite Dev Server (HMR) | `./scripts/start-frontend.sh --dev` |
+| `scripts/install-opencode.sh` | 下载并安装 opencode | `./scripts/install-opencode.sh` |
+| `scripts/start-agent.sh` | 一键启动 opencode Code Agent 服务 | `./scripts/start-agent.sh` |
 | `scripts/stop-all.sh` | 停止所有服务 | `./scripts/stop-all.sh` |
 
 ### 测试
@@ -376,6 +383,83 @@ export OPENAI_API_KEY="dummy"
 # 启动 aider 并指定综合加速模型
 aider --model openai/qwen3.8-flash-next-oq4e-mtp-128k
 ```
+
+---
+
+## 🤖 opencode Code Agent 服务
+
+本模块集成开源终端代码智能体 [opencode](https://opencode.ai)，以本项目的
+`qwen3.8-flash-next-oq4e-mtp-128k` 模型作为 LLM 提供方，对外提供具备
+**读写文件、执行命令、多轮自主编码** 能力的 code agent 服务。
+
+### 一键启动
+
+```bash
+./scripts/start-agent.sh
+```
+
+脚本会自动完成：
+
+1. 检测并安装 opencode（等价于单独执行 `./scripts/install-opencode.sh`）
+2. 若 Python LLM 后端未运行，自动拉起并等待 `/health` 就绪
+3. 由 `agent/opencode.json.template` 渲染生成 `agent/opencode.json`，注入后端地址与模型名
+4. 以 `opencode serve` 启动 HTTP 服务，默认监听 `0.0.0.0:4096`
+
+停止服务：`Ctrl+C` 或 `./scripts/stop-all.sh`。
+
+### LLM 提供方配置
+
+核心配置见 `agent/opencode.json.template`，通过 `@ai-sdk/openai-compatible`
+自定义 provider 指向本地服务：
+
+```json
+{
+  "provider": {
+    "aicodeservice": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "AI Code Service (本地 Qwen3.8 Flash Next)",
+      "options": {
+        "baseURL": "http://localhost:1235/v1",
+        "apiKey": "not-needed"
+      },
+      "models": { "qwen3.8-flash-next-oq4e-mtp-128k": { "limit": { "context": 131072, "output": 8192 } } }
+    }
+  },
+  "model": "aicodeservice/qwen3.8-flash-next-oq4e-mtp-128k"
+}
+```
+
+### 使用方式
+
+- **终端交互 CLI**：`cd agent && opencode`（自动读取本目录的 `opencode.json`）
+- **HTTP API**：`opencode serve` 提供 REST 接口（会话、消息、SSE 事件流），根路径如
+  `GET http://localhost:4096/global/health`，完整 API 见 opencode 官方 SDK 文档
+
+### 服务安全
+
+当 `OPENCODE_HOST` 为非回环地址时，`start-agent.sh` 会自动生成 Basic Auth 密码
+（用户名 `opencode`），存于 `agent/.opencode-password`（已 gitignore）。
+也可通过环境变量 `OPENCODE_SERVER_PASSWORD` 自行指定。
+
+### 后端 tools 协议支持
+
+opencode 的 agent 循环依赖 OpenAI `tools`/`tool_calls` 协议，本项目的
+`/v1/chat/completions` 已内建支持（见 `engine/tool_format.py`）：
+
+- 请求携带 `tools` 时，按模型 `chat_template.jinja` 原生格式注入工具声明
+- 模型原生工具调用标签会被解析为标准 `tool_calls` 字段返回
+- 多轮历史中的 `tool_calls` 与 `role=tool` 结果消息会还原为模型原生格式
+- 流式模式下思考块与调用块不泄漏到正文增量，工具调用在结束帧附带
+
+### 环境变量 (`.env`)
+
+| 变量 | 默认值 | 说明 |
+| :--- | :--- | :--- |
+| `OPENCODE_HOST` | `0.0.0.0` | agent 服务监听地址 |
+| `OPENCODE_PORT` | `4096` | agent 服务端口 |
+
+> 注意：agent 会按 `permission` 配置自主执行文件编辑与 shell 命令，建议在受控目录
+> （`agent/`）内使用，或按需收紧模板中的权限配置。
 
 ---
 

@@ -15,12 +15,32 @@ from schemas import (
     ChatCompletionResponse,
     ChatChoice,
     ChatMessage,
+    ToolCall,
+    ToolCallFunction,
     UsageInfo,
 )
 from engine import ModelManager
 from engine.cache import ResponseCache
+from engine import tool_format
 
 router = APIRouter(tags=["Chat Completions & Responses"])
+
+
+def normalize_content(content: Any) -> str:
+    """将 OpenAI 多模态 content (str 或 parts 列表) 归一化为纯文本"""
+    if content is None:
+        return ""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, dict) and item.get("type") == "text":
+                parts.append(item.get("text", ""))
+            elif isinstance(item, str):
+                parts.append(item)
+        return "\n".join(parts)
+    return str(content)
 
 
 def get_model_manager(request: Request) -> ModelManager:
@@ -53,7 +73,12 @@ async def create_chat_completion(
 
     if req.messages:
         for m in req.messages:
-            msg_dicts.append({"role": m.role, "content": m.content})
+            entry: Dict[str, Any] = {"role": m.role, "content": normalize_content(m.content)}
+            if m.tool_call_id:
+                entry["tool_call_id"] = m.tool_call_id
+            if m.tool_calls:
+                entry["tool_calls"] = [tc.model_dump() for tc in m.tool_calls]
+            msg_dicts.append(entry)
     elif req.input is not None:
         if isinstance(req.input, str):
             msg_dicts.append({"role": "user", "content": req.input})
@@ -72,7 +97,32 @@ async def create_chat_completion(
     if not msg_dicts:
         msg_dicts = [{"role": "user", "content": ""}]
 
-    prompt = manager.build_chat_prompt(msg_dicts)
+    use_tools = req.tools if req.tools and req.tool_choice != "none" else None
+
+    # 思考模式控制：在 Code Agent 模式或工具调用场景下，如果客户端未显式要求 thinking，默认关闭以减少首字延迟和不必要的多轮思考 token
+    enable_thinking = req.enable_thinking
+    if enable_thinking is None and (use_tools or (manager.config.performance and manager.config.performance.code_agent_mode)):
+        enable_thinking = False
+
+    prompt = manager.build_chat_prompt(msg_dicts, tools=use_tools, enable_thinking=enable_thinking)
+
+    # 温度与采样参数：Code Agent 模式下默认 0.0 (argmax)，大幅提高 MTP 投机推测命中率与代码生成稳定性
+    if req.temperature is not None:
+        effective_temp = req.temperature
+    elif manager.config.performance and manager.config.performance.code_agent_mode:
+        effective_temp = manager.config.performance.default_temperature
+    else:
+        effective_temp = 0.7
+
+    # 工具调用模式下注入原生结束标签作为 stop 序列，避免多余生成
+    stop_seqs: List[str] = []
+    if req.stop:
+        stop_seqs += [req.stop] if isinstance(req.stop, str) else list(req.stop)
+    if use_tools:
+        for t_stop in [tool_format.TC_CLOSE, "<|im_end|>"]:
+            if t_stop not in stop_seqs:
+                stop_seqs.append(t_stop)
+    stop_param = stop_seqs or None
 
     engine = manager.get_engine(model_name)
     request_id = f"chatcmpl-{uuid.uuid4().hex[:12]}"
@@ -89,7 +139,7 @@ async def create_chat_completion(
         prefix="chat",
         model=model_name,
         prompt=prompt,
-        temperature=req.temperature,
+        temperature=effective_temp,
         top_p=req.top_p,
         stop=req.stop,
         seed=req.seed,
@@ -109,15 +159,25 @@ async def create_chat_completion(
                     tokens_gen = engine.async_stream_generate(
                         prompt=prompt,
                         max_tokens=max_toks,
-                        temperature=req.temperature,
+                        temperature=effective_temp,
                         top_p=req.top_p,
-                        stop=req.stop,
+                        stop=stop_param,
                         seed=req.seed,
                         chunk_size=stream_chunk_size,
                     )
                     full_output_text = ""
+                    region_filter = tool_format.StreamRegionFilter() if use_tools else None
+                    raw_output_text = ""
                     async for chunk_text in tokens_gen:
-                        full_output_text += chunk_text
+                        if region_filter is not None:
+                            raw_output_text += chunk_text
+                            visible = region_filter.feed(chunk_text)
+                            if not visible:
+                                continue
+                            full_output_text += visible
+                        else:
+                            visible = chunk_text
+                            full_output_text += visible
                         chunk_payload = {
                             "id": request_id,
                             "object": "chat.completion.chunk",
@@ -126,17 +186,70 @@ async def create_chat_completion(
                             "choices": [
                                 {
                                     "index": 0,
-                                    "delta": {"content": chunk_text},
+                                    "delta": {"content": visible},
                                     "finish_reason": None,
                                 }
                             ],
                         }
                         yield f"data: {json.dumps(chunk_payload, ensure_ascii=False)}\n\n"
 
-                # 计算实际生成 token 数
-                completion_tokens = engine.count_tokens(full_output_text)
+                    # 流结束: 若已进入工具/思考区域则吞掉残余文本，否则冲刷尾部可见内容。
+                    # 思考未闭合时保留尾部 (无 tools 的普通回答常被 max_tokens 截断于思考区，
+                    # 客户端依赖累积的 delta 展示进度，解析工具调用仍使用 raw 文本)。
+                    tool_calls: List[Dict[str, Any]] = []
+                    if region_filter is not None:
+                        if region_filter.has_tool_region():
+                            region_filter.flush()
+                        elif region_filter.in_thinking:
+                            keep_tail = region_filter.flush()
+                            full_output_text += keep_tail
+                            if keep_tail:
+                                tail_payload = {
+                                    "id": request_id,
+                                    "object": "chat.completion.chunk",
+                                    "created": created_time,
+                                    "model": model_name,
+                                    "choices": [
+                                        {
+                                            "index": 0,
+                                            "delta": {"content": keep_tail},
+                                            "finish_reason": None,
+                                        }
+                                    ],
+                                }
+                                yield f"data: {json.dumps(tail_payload, ensure_ascii=False)}\n\n"
+                        else:
+                            tail_visible = region_filter.flush()
+                            full_output_text += tail_visible
+                            if tail_visible:
+                                flush_payload = {
+                                    "id": request_id,
+                                    "object": "chat.completion.chunk",
+                                    "created": created_time,
+                                    "model": model_name,
+                                    "choices": [
+                                        {
+                                            "index": 0,
+                                            "delta": {"content": tail_visible},
+                                            "finish_reason": None,
+                                        }
+                                    ],
+                                }
+                                yield f"data: {json.dumps(flush_payload, ensure_ascii=False)}\n\n"
+                        _, tool_calls = tool_format.parse_tool_calls(raw_output_text)
 
-                # 结束 Chunk (附带 usage 统计供客户端精确计算 TPS)
+                finish_reason = "tool_calls" if tool_calls else "stop"
+                # 计算实际生成 token 数
+                completion_tokens = engine.count_tokens(raw_output_text if region_filter is not None else full_output_text)
+
+                done_delta: Dict[str, Any] = {}
+                if tool_calls:
+                    indexed_calls = []
+                    for idx, tc in enumerate(tool_calls):
+                        tc_dict = dict(tc)
+                        tc_dict["index"] = idx
+                        indexed_calls.append(tc_dict)
+                    done_delta["tool_calls"] = indexed_calls
                 done_payload = {
                     "id": request_id,
                     "object": "chat.completion.chunk",
@@ -145,8 +258,8 @@ async def create_chat_completion(
                     "choices": [
                         {
                             "index": 0,
-                            "delta": {},
-                            "finish_reason": "stop",
+                            "delta": done_delta,
+                            "finish_reason": finish_reason,
                         }
                     ],
                     "usage": {
@@ -169,9 +282,9 @@ async def create_chat_completion(
 
         return StreamingResponse(async_stream_generator(), media_type="text/event-stream")
 
-    # 非流式响应（优先命中缓存，未命中则异步非阻塞推理）
+    # 非流式响应（优先命中缓存，未命中则异步非阻塞推理；工具调用请求不缓存以保证 agent 循环实时性）
     else:
-        cached_result = manager.cache.get(cache_key)
+        cached_result = None if use_tools else manager.cache.get(cache_key)
         if cached_result is not None:
             output_text, completion_tokens = cached_result
             if response is not None:
@@ -182,13 +295,14 @@ async def create_chat_completion(
                     output_text = await engine.async_generate(
                         prompt=prompt,
                         max_tokens=max_toks,
-                        temperature=req.temperature,
+                        temperature=effective_temp,
                         top_p=req.top_p,
-                        stop=req.stop,
+                        stop=stop_param,
                         seed=req.seed,
                     )
                 completion_tokens = engine.count_tokens(output_text)
-                manager.cache.set(cache_key, (output_text, completion_tokens))
+                if not use_tools:
+                    manager.cache.set(cache_key, (output_text, completion_tokens))
                 if response is not None:
                     response.headers["X-Cache"] = "MISS"
             except Exception as e:
@@ -198,6 +312,20 @@ async def create_chat_completion(
             response.headers["X-Prompt-Tokens"] = str(prompt_tokens)
             response.headers["X-Completion-Tokens"] = str(completion_tokens)
 
+        visible_text = output_text
+        tool_call_dicts: List[Dict[str, Any]] = []
+        if use_tools:
+            visible_text, tool_call_dicts = tool_format.parse_tool_calls(output_text)
+            if tool_call_dicts:
+                visible_text = visible_text.replace(tool_format.THINK_CLOSE, "").strip()
+        if not tool_call_dicts:
+            visible_text = tool_format.clean_think_tags(visible_text)
+
+        message = ChatMessage(
+            role="assistant",
+            content=visible_text,
+            tool_calls=[ToolCall(**tc) for tc in tool_call_dicts] or None,
+        )
         return ChatCompletionResponse(
             id=request_id,
             object="chat.completion",
@@ -206,8 +334,8 @@ async def create_chat_completion(
             choices=[
                 ChatChoice(
                     index=0,
-                    message=ChatMessage(role="assistant", content=output_text),
-                    finish_reason="stop",
+                    message=message,
+                    finish_reason="tool_calls" if tool_call_dicts else "stop",
                 )
             ],
             usage=UsageInfo(

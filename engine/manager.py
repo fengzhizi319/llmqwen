@@ -82,12 +82,15 @@ class ModelManager:
 
         spec = self.config.models[target_name]
         perf = getattr(self.config, "performance", None)
-        metal_limit = perf.metal_cache_limit_mb if perf else 4096
+        metal_limit = perf.metal_cache_limit_mb if perf else 8192
         clear_cache = perf.clear_cache_after_generation if perf else False
         kv_bits = perf.kv_bits if perf else 8
         kv_group_size = perf.kv_group_size if perf else 64
         prefill_step = perf.prefill_step_size if perf else 2048
         enable_prompt_cache = perf.enable_prompt_cache if perf else True
+        enable_mtp = getattr(perf, "enable_mtp", True) if perf else True
+        mtp_depth = getattr(perf, "mtp_depth", 3) if perf else 3
+        code_agent_mode = getattr(perf, "code_agent_mode", True) if perf else True
 
         try:
             # 根据 engine_type 选择引擎实现
@@ -102,6 +105,9 @@ class ModelManager:
                     kv_group_size=kv_group_size,
                     prefill_step_size=prefill_step,
                     enable_prompt_cache=enable_prompt_cache,
+                    enable_mtp=enable_mtp,
+                    mtp_depth=mtp_depth,
+                    code_agent_mode=code_agent_mode,
                 )
             else:
                 engine = MLXModelEngine(
@@ -114,6 +120,9 @@ class ModelManager:
                     kv_group_size=kv_group_size,
                     prefill_step_size=prefill_step,
                     enable_prompt_cache=enable_prompt_cache,
+                    enable_mtp=enable_mtp,
+                    mtp_depth=mtp_depth,
+                    code_agent_mode=code_agent_mode,
                 )
             self.engines[target_name] = engine
             return engine
@@ -123,30 +132,91 @@ class ModelManager:
             self.engines[target_name] = engine
             return engine
 
-    def build_chat_prompt(self, messages: List[Dict[str, str]], system_prompt: Optional[str] = None) -> str:
-        """根据消息构建标准 Chat Prompt (符合 Qwen/ChatML 格式)"""
-        formatted_messages = list(messages)
-        
-        # 确保注入 system prompt 并附加防伪造工具调用约束
-        has_system = any(m.get("role") == "system" for m in formatted_messages)
-        if not has_system:
-            sys_content = system_prompt or self.config.system_prompt
-            formatted_messages.insert(0, {"role": "system", "content": sys_content})
+    GUARDRAIL = (
+        "\n\n【核心约束】请直接输出解答与完整的带注释代码，禁止输出工具调用标签。"
+        "如果未收到代码正文，请直接引导用户提供代码或在编辑器中选中代码。"
+    )
+
+    def build_chat_prompt(
+        self,
+        messages: List[Dict[str, Any]],
+        system_prompt: Optional[str] = None,
+        tools: Optional[List[Dict[str, Any]]] = None,
+        enable_thinking: Optional[bool] = None,
+    ) -> str:
+        """根据消息构建标准 Chat Prompt (符合 Qwen/ChatML 格式)
+
+        - tools 非空时注入模型原生工具声明块 (见 engine/tool_format.py)，并跳过防工具标签约束
+        - assistant 历史消息中的 tool_calls 会序列化回模型原生调用格式
+        - role=tool 的工具执行结果按模板约定包装为 user 消息的 tool_result 块
+        """
+        from . import tool_format
+
+        formatted_messages = [dict(m) for m in messages]
+
+        user_system = ""
+        rest: List[Dict[str, Any]] = []
+        for msg in formatted_messages:
+            if msg.get("role") == "system" and not user_system:
+                user_system = msg.get("content") or ""
+            else:
+                rest.append(msg)
+
+        if tools:
+            system_content = tool_format.render_tools_block(tools)
+            if user_system.strip():
+                system_content += "\n\n" + user_system
         else:
-            for msg in formatted_messages:
-                if msg.get("role") == "system":
-                    content = msg.get("content", "")
-                    guardrail = "\n\n【核心约束】请直接输出解答与完整的带注释代码，禁止输出 <tool_call> 或 <function=...> 标签。如果未收到代码正文，请直接引导用户提供代码或在编辑器中选中代码。"
-                    if "【核心约束】" not in content:
-                        msg["content"] = content + guardrail
+            if not user_system:
+                system_content = system_prompt or self.config.system_prompt
+            elif "【核心约束】" in user_system:
+                system_content = user_system
+            else:
+                system_content = user_system + self.GUARDRAIL
 
         prompt_parts = []
-        for msg in formatted_messages:
+        if system_content:
+            prompt_parts.append(f"<|im_start|>system\n{system_content}<|im_end|>")
+
+        # 合并连续的 tool 消息为一个 user 消息块 (严格符合 Qwen 官方 chat_template.jinja)
+        grouped_messages: List[Dict[str, Any]] = []
+        for msg in rest:
             role = msg.get("role", "user")
-            content = msg.get("content", "")
-            prompt_parts.append(f"<|im_start|>{role}\n{content}<|im_end|>")
-        
-        prompt_parts.append("<|im_start|>assistant\n")
+            content = msg.get("content") or ""
+            if role == "tool":
+                if grouped_messages and grouped_messages[-1].get("role") == "tool":
+                    grouped_messages[-1]["tool_items"].append(content)
+                else:
+                    grouped_messages.append({"role": "tool", "tool_items": [content]})
+            else:
+                grouped_messages.append(msg)
+
+        for gmsg in grouped_messages:
+            role = gmsg.get("role", "user")
+            if role == "assistant":
+                content = tool_format.clean_think_tags(gmsg.get("content") or "")
+                if gmsg.get("tool_calls"):
+                    raw_calls = [
+                        tc if isinstance(tc, dict) else tc.model_dump()
+                        for tc in gmsg["tool_calls"]
+                    ]
+                    block = tool_format.serialize_assistant_tool_calls(raw_calls)
+                    content = f"{content}\n\n{block}" if content.strip() else block
+                prompt_parts.append(f"<|im_start|>assistant\n{content}<|im_end|>")
+            elif role == "tool":
+                tool_blocks = [tool_format.render_tool_message(c) for c in gmsg.get("tool_items", [])]
+                inner = "\n".join(tool_blocks)
+                prompt_parts.append(f"<|im_start|>user\n{inner}<|im_end|>")
+            else:
+                content = gmsg.get("content") or ""
+                prompt_parts.append(f"<|im_start|>{role}\n{content}<|im_end|>")
+
+        tail = "<|im_start|>assistant\n"
+        if enable_thinking is False:
+            tail += f"{tool_format.THINK_OPEN}\n\n{tool_format.THINK_CLOSE}\n\n"
+        else:
+            tail += f"{tool_format.THINK_OPEN}\n"
+        prompt_parts.append(tail)
         return "\n".join(prompt_parts)
 
     def build_fim_prompt(self, prefix: str, suffix: Optional[str] = None) -> str:

@@ -1,0 +1,1536 @@
+{
+  "dataset": "mbpp",
+  "pass_at_1": 0.0,
+  "passed": 0,
+  "total": 300,
+  "avg_elapsed_s": 0.0,
+  "avg_tps": 0.0,
+  "by_tier": {
+    "基础(id1-300)": {
+      "total": 100,
+      "pass": 0,
+      "elapsed": 0.0,
+      "tokens": 0,
+      "pass_rate": 0.0,
+      "tps": 0.0
+    },
+    "中级(id301-600)": {
+      "total": 100,
+      "pass": 0,
+      "elapsed": 0.0,
+      "tokens": 0,
+      "pass_rate": 0.0,
+      "tps": 0.0
+    },
+    "综合(id601-974)": {
+      "total": 100,
+      "pass": 0,
+      "elapsed": 0.0,
+      "tokens": 0,
+      "pass_rate": 0.0,
+      "tps": 0.0
+    }
+  },
+  "failures": [
+    {
+      "uid": "mbpp_102",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_103",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_111",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_112",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_113",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_115",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_117",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_119",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_12",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_120",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_126",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_13",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_136",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_137",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_14",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_141",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_143",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_148",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_15",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_151",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_156",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_16",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_163",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_164",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_166",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_17",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_170",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_172",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_173",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_175",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_176",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_177",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_18",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_180",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_181",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_184",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_186",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_187",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_19",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_194",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_195",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_197",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_198",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_199",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_21",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_214",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_215",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_217",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_219",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_222",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_23",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_230",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_235",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_236",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_238",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_241",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_249",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_259",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_26",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_264",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_266",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_273",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_274",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_278",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_279",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_280",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_288",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_290",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_291",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_293",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_294",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_295",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_301",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_302",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_305",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_306",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_315",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_318",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_321",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_322",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_325",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_328",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_329",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_333",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_340",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_342",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_343",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_347",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_351",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_355",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_357",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_358",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_359",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_362",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_368",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_371",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_372",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_374",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_377",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_379",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_381",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_382",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_383",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_392",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_393",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_396",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_4",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_409",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_41",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_413",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_42",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_422",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_425",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_426",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_427",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_429",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_430",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_435",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_436",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_437",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_439",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_44",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_441",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_446",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_45",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_451",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_454",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_456",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_461",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_462",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_464",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_469",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_475",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_48",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_486",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_488",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_495",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_496",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_497",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_498",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_50",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_500",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_503",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_505",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_507",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_509",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_511",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_513",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_516",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_517",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_520",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_523",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_524",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_525",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_53",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_533",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_534",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_535",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_536",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_537",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_538",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_54",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_540",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_546",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_553",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_555",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_556",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_557",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_561",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_562",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_566",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_57",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_571",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_573",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_576",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_58",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_587",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_588",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_589",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_59",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_591",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_592",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_597",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_60",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_600",
+      "tier": "中级(id301-600)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_602",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_604",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_608",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_611",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_617",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_626",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_628",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_63",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_630",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_631",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_632",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_633",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_635",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_637",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_639",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_64",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_648",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_649",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_650",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_651",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_656",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_662",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_668",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_672",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_680",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_685",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_686",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_69",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_694",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_698",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_699",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_70",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_703",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_710",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_712",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_713",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_716",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_718",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_72",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_722",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_725",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_727",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_728",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_736",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_743",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_747",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_75",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_752",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_760",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_770",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_774",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_782",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_792",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_795",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_80",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_800",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_805",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_806",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_807",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_809",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_81",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_811",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_817",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_82",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_821",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_825",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_827",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_830",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_832",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_833",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_837",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_84",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_840",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_843",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_847",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_849",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_850",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_864",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_865",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_875",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_877",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_882",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_884",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_893",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_896",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_9",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_902",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_909",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_91",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_913",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_915",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_920",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_924",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_929",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_930",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_933",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_937",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_938",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_939",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_94",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_940",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_941",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_944",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_948",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_949",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_95",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_950",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_954",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_956",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_958",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_966",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_967",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_973",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_974",
+      "tier": "综合(id601-974)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "mbpp_98",
+      "tier": "基础(id1-300)",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    }
+  ]
+}

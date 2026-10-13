@@ -9,6 +9,7 @@ load_env
 
 PORT="${PORT:-1235}"
 WEB_PORT="${WEB_PORT:-8080}"
+OPENCODE_PORT="${OPENCODE_PORT:-4096}"
 
 print_banner
 log_step "停止所有服务"
@@ -16,7 +17,7 @@ log_step "停止所有服务"
 stopped=0
 
 # 通过 PID 文件停止
-for pidfile in /tmp/aicode-backend.pid /tmp/aicode-frontend.pid; do
+for pidfile in /tmp/aicode-backend.pid /tmp/aicode-frontend.pid /tmp/aicode-agent.pid; do
     if [ -f "$pidfile" ]; then
         pid=$(cat "$pidfile")
         if kill -0 "$pid" 2>/dev/null; then
@@ -29,7 +30,7 @@ for pidfile in /tmp/aicode-backend.pid /tmp/aicode-frontend.pid; do
 done
 
 # 通过端口停止 (兜底)
-for port in "$PORT" "$WEB_PORT"; do
+for port in "$PORT" "$WEB_PORT" "$OPENCODE_PORT"; do
     pid=$(lsof -ti :"$port" 2>/dev/null || true)
     if [ -n "$pid" ]; then
         kill "$pid" 2>/dev/null || true

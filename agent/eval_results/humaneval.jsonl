@@ -1,0 +1,164 @@
+{"uid": "0", "tier": "算法与逻辑", "entry_point": "has_close_elements", "pass": true, "elapsed": 9.4, "completion_tokens": 172, "tps": 18.3, "err": ""}
+{"uid": "1", "tier": "字符串", "entry_point": "separate_paren_groups", "pass": true, "elapsed": 9.12, "completion_tokens": 223, "tps": 24.5, "err": ""}
+{"uid": "2", "tier": "数值与数学", "entry_point": "truncate_number", "pass": true, "elapsed": 4.52, "completion_tokens": 96, "tps": 21.3, "err": ""}
+{"uid": "3", "tier": "其他", "entry_point": "below_zero", "pass": true, "elapsed": 6.46, "completion_tokens": 156, "tps": 24.1, "err": ""}
+{"uid": "4", "tier": "数值与数学", "entry_point": "mean_absolute_deviation", "pass": true, "elapsed": 7.76, "completion_tokens": 177, "tps": 22.8, "err": ""}
+{"uid": "5", "tier": "列表与集合", "entry_point": "intersperse", "pass": true, "elapsed": 5.9, "completion_tokens": 143, "tps": 24.2, "err": ""}
+{"uid": "6", "tier": "字符串", "entry_point": "parse_nested_parens", "pass": true, "elapsed": 8.88, "completion_tokens": 215, "tps": 24.2, "err": ""}
+{"uid": "7", "tier": "字符串", "entry_point": "filter_by_substring", "pass": true, "elapsed": 5.75, "completion_tokens": 111, "tps": 19.3, "err": ""}
+{"uid": "8", "tier": "数值与数学", "entry_point": "sum_product", "pass": true, "elapsed": 7.41, "completion_tokens": 162, "tps": 21.9, "err": ""}
+{"uid": "9", "tier": "列表与集合", "entry_point": "rolling_max", "pass": true, "elapsed": 7.47, "completion_tokens": 160, "tps": 21.4, "err": ""}
+{"uid": "10", "tier": "字符串", "entry_point": "make_palindrome", "pass": true, "elapsed": 12.34, "completion_tokens": 277, "tps": 22.4, "err": ""}
+{"uid": "11", "tier": "字符串", "entry_point": "string_xor", "pass": true, "elapsed": 6.13, "completion_tokens": 139, "tps": 22.7, "err": ""}
+{"uid": "12", "tier": "其他", "entry_point": "longest", "pass": true, "elapsed": 6.66, "completion_tokens": 127, "tps": 19.1, "err": ""}
+{"uid": "13", "tier": "算法与逻辑", "entry_point": "greatest_common_divisor", "pass": true, "elapsed": 4.27, "completion_tokens": 96, "tps": 22.5, "err": ""}
+{"uid": "14", "tier": "其他", "entry_point": "all_prefixes", "pass": true, "elapsed": 3.79, "completion_tokens": 78, "tps": 20.6, "err": ""}
+{"uid": "15", "tier": "字符串", "entry_point": "string_sequence", "pass": true, "elapsed": 4.43, "completion_tokens": 91, "tps": 20.5, "err": ""}
+{"uid": "16", "tier": "算法与逻辑", "entry_point": "count_distinct_characters", "pass": true, "elapsed": 4.14, "completion_tokens": 80, "tps": 19.3, "err": ""}
+{"uid": "17", "tier": "算法与逻辑", "entry_point": "parse_music", "pass": true, "elapsed": 12.59, "completion_tokens": 274, "tps": 21.8, "err": ""}
+{"uid": "18", "tier": "其他", "entry_point": "how_many_times", "pass": true, "elapsed": 8.21, "completion_tokens": 160, "tps": 19.5, "err": ""}
+{"uid": "19", "tier": "数值与数学", "entry_point": "sort_numbers", "pass": true, "elapsed": 11.86, "completion_tokens": 260, "tps": 21.9, "err": ""}
+{"uid": "20", "tier": "其他", "entry_point": "find_closest_elements", "pass": true, "elapsed": 12.53, "completion_tokens": 272, "tps": 21.7, "err": ""}
+{"uid": "21", "tier": "其他", "entry_point": "rescale_to_unit", "pass": true, "elapsed": 8.27, "completion_tokens": 192, "tps": 23.2, "err": ""}
+{"uid": "22", "tier": "列表与集合", "entry_point": "filter_integers", "pass": true, "elapsed": 5.33, "completion_tokens": 118, "tps": 22.1, "err": ""}
+{"uid": "23", "tier": "字符串", "entry_point": "strlen", "pass": true, "elapsed": 3.0, "completion_tokens": 52, "tps": 17.3, "err": ""}
+{"uid": "24", "tier": "算法与逻辑", "entry_point": "largest_divisor", "pass": true, "elapsed": 4.31, "completion_tokens": 90, "tps": 20.9, "err": ""}
+{"uid": "25", "tier": "其他", "entry_point": "factorize", "pass": true, "elapsed": 14.56, "completion_tokens": 291, "tps": 20.0, "err": ""}
+{"uid": "26", "tier": "列表与集合", "entry_point": "remove_duplicates", "pass": true, "elapsed": 6.72, "completion_tokens": 118, "tps": 17.6, "err": ""}
+{"uid": "27", "tier": "其他", "entry_point": "flip_case", "pass": true, "elapsed": 3.19, "completion_tokens": 57, "tps": 17.9, "err": ""}
+{"uid": "28", "tier": "列表与集合", "entry_point": "concatenate", "pass": true, "elapsed": 4.11, "completion_tokens": 69, "tps": 16.8, "err": ""}
+{"uid": "29", "tier": "列表与集合", "entry_point": "filter_by_prefix", "pass": true, "elapsed": 6.55, "completion_tokens": 106, "tps": 16.2, "err": ""}
+{"uid": "30", "tier": "其他", "entry_point": "get_positive", "pass": true, "elapsed": 7.71, "completion_tokens": 138, "tps": 17.9, "err": ""}
+{"uid": "31", "tier": "数值与数学", "entry_point": "is_prime", "pass": true, "elapsed": 10.57, "completion_tokens": 212, "tps": 20.1, "err": ""}
+{"uid": "32", "tier": "其他", "entry_point": "find_zero", "pass": true, "elapsed": 22.05, "completion_tokens": 514, "tps": 23.3, "err": ""}
+{"uid": "33", "tier": "算法与逻辑", "entry_point": "sort_third", "pass": true, "elapsed": 12.57, "completion_tokens": 289, "tps": 23.0, "err": ""}
+{"uid": "34", "tier": "列表与集合", "entry_point": "unique", "pass": true, "elapsed": 4.47, "completion_tokens": 86, "tps": 19.3, "err": ""}
+{"uid": "35", "tier": "算法与逻辑", "entry_point": "max_element", "pass": true, "elapsed": 4.74, "completion_tokens": 96, "tps": 20.2, "err": ""}
+{"uid": "36", "tier": "其他", "entry_point": "fizz_buzz", "pass": true, "elapsed": 6.72, "completion_tokens": 141, "tps": 21.0, "err": ""}
+{"uid": "37", "tier": "算法与逻辑", "entry_point": "sort_even", "pass": true, "elapsed": 10.25, "completion_tokens": 224, "tps": 21.9, "err": ""}
+{"uid": "38", "tier": "算法与逻辑", "entry_point": "decode_cyclic", "pass": true, "elapsed": 15.89, "completion_tokens": 276, "tps": 17.4, "err": ""}
+{"uid": "39", "tier": "数值与数学", "entry_point": "prime_fib", "pass": true, "elapsed": 12.93, "completion_tokens": 250, "tps": 19.3, "err": ""}
+{"uid": "40", "tier": "其他", "entry_point": "triples_sum_to_zero", "pass": true, "elapsed": 16.84, "completion_tokens": 335, "tps": 19.9, "err": ""}
+{"uid": "41", "tier": "算法与逻辑", "entry_point": "car_race_collision", "pass": true, "elapsed": 9.11, "completion_tokens": 162, "tps": 17.8, "err": ""}
+{"uid": "42", "tier": "列表与集合", "entry_point": "incr_list", "pass": true, "elapsed": 6.98, "completion_tokens": 131, "tps": 18.8, "err": ""}
+{"uid": "43", "tier": "其他", "entry_point": "pairs_sum_to_zero", "pass": true, "elapsed": 10.34, "completion_tokens": 200, "tps": 19.3, "err": ""}
+{"uid": "44", "tier": "其他", "entry_point": "change_base", "pass": true, "elapsed": 8.45, "completion_tokens": 160, "tps": 18.9, "err": ""}
+{"uid": "45", "tier": "其他", "entry_point": "triangle_area", "pass": true, "elapsed": 4.16, "completion_tokens": 59, "tps": 14.2, "err": ""}
+{"uid": "46", "tier": "数值与数学", "entry_point": "fib4", "pass": true, "elapsed": 16.42, "completion_tokens": 348, "tps": 21.2, "err": ""}
+{"uid": "47", "tier": "数值与数学", "entry_point": "median", "pass": true, "elapsed": 8.07, "completion_tokens": 152, "tps": 18.8, "err": ""}
+{"uid": "48", "tier": "字符串", "entry_point": "is_palindrome", "pass": true, "elapsed": 4.98, "completion_tokens": 86, "tps": 17.3, "err": ""}
+{"uid": "49", "tier": "数值与数学", "entry_point": "modp", "pass": true, "elapsed": 7.33, "completion_tokens": 133, "tps": 18.1, "err": ""}
+{"uid": "50", "tier": "算法与逻辑", "entry_point": "decode_shift", "pass": true, "elapsed": 7.21, "completion_tokens": 132, "tps": 18.3, "err": ""}
+{"uid": "51", "tier": "列表与集合", "entry_point": "remove_vowels", "pass": true, "elapsed": 8.63, "completion_tokens": 165, "tps": 19.1, "err": ""}
+{"uid": "52", "tier": "列表与集合", "entry_point": "below_threshold", "pass": true, "elapsed": 5.82, "completion_tokens": 99, "tps": 17.0, "err": ""}
+{"uid": "53", "tier": "其他", "entry_point": "add", "pass": true, "elapsed": 3.42, "completion_tokens": 62, "tps": 18.1, "err": ""}
+{"uid": "54", "tier": "其他", "entry_point": "same_chars", "pass": true, "elapsed": 8.62, "completion_tokens": 160, "tps": 18.6, "err": ""}
+{"uid": "55", "tier": "数值与数学", "entry_point": "fib", "pass": true, "elapsed": 6.92, "completion_tokens": 129, "tps": 18.6, "err": ""}
+{"uid": "56", "tier": "其他", "entry_point": "correct_bracketing", "pass": true, "elapsed": 7.75, "completion_tokens": 156, "tps": 20.1, "err": ""}
+{"uid": "57", "tier": "数值与数学", "entry_point": "monotonic", "pass": true, "elapsed": 8.82, "completion_tokens": 173, "tps": 19.6, "err": ""}
+{"uid": "58", "tier": "其他", "entry_point": "common", "pass": true, "elapsed": 8.53, "completion_tokens": 163, "tps": 19.1, "err": ""}
+{"uid": "59", "tier": "数值与数学", "entry_point": "largest_prime_factor", "pass": true, "elapsed": 9.28, "completion_tokens": 198, "tps": 21.3, "err": ""}
+{"uid": "60", "tier": "其他", "entry_point": "sum_to_n", "pass": true, "elapsed": 5.93, "completion_tokens": 124, "tps": 20.9, "err": ""}
+{"uid": "61", "tier": "其他", "entry_point": "correct_bracketing", "pass": true, "elapsed": 8.45, "completion_tokens": 155, "tps": 18.3, "err": ""}
+{"uid": "62", "tier": "其他", "entry_point": "derivative", "pass": true, "elapsed": 7.45, "completion_tokens": 135, "tps": 18.1, "err": ""}
+{"uid": "63", "tier": "数值与数学", "entry_point": "fibfib", "pass": true, "elapsed": 13.07, "completion_tokens": 276, "tps": 21.1, "err": ""}
+{"uid": "64", "tier": "算法与逻辑", "entry_point": "vowels_count", "pass": true, "elapsed": 9.27, "completion_tokens": 173, "tps": 18.7, "err": ""}
+{"uid": "65", "tier": "其他", "entry_point": "circular_shift", "pass": true, "elapsed": 7.82, "completion_tokens": 151, "tps": 19.3, "err": ""}
+{"uid": "66", "tier": "数值与数学", "entry_point": "digitSum", "pass": true, "elapsed": 6.48, "completion_tokens": 139, "tps": 21.4, "err": ""}
+{"uid": "67", "tier": "字符串", "entry_point": "fruit_distribution", "pass": false, "elapsed": 13.6, "completion_tokens": 314, "tps": 23.1, "err": "ValueError: invalid literal for int() with base 10: 'and'", "code": "def fruit_distribution(s, n):\n    \"\"\"\n    In this task, you will be given a string that represents a number of apples and oranges \n    that are distributed in a basket of fruit this basket contains \n    apples, oranges, and mango fruits. Given the string that represents the total number of \n    the oranges and apples and an integer that represent the total number of the fruits \n    in the basket return the number of the mango fruits in the basket.\n    for examble:\n    fruit_distribution(\"5 apples and 6 oranges\", 19) ->19 - 5 - 6 = 8\n    fruit_distribution(\"0 apples and 1 oranges\",3) -> 3 - 0 - 1 = 2\n    fruit_distribution(\"2 apples and 3 oranges\", 100) -> 100 - 2 - 3 = 95\n    fruit_distribution(\"100 apples and 1 oranges\",120) -> 100 - 100 - 1 = 19\n    \"\"\"\n    # Split the string by spaces to extract numbers\n    parts = s.split()\n    # The first part is the number of apples, the third part is the number of oranges\n    apples = int(parts[0])\n    oranges = int(parts[2])\n    # Calculate mangoes as total fruits minus apples and oranges\n    mangoes = n - apples - oranges\n    return mangoes"}
+{"uid": "68", "tier": "其他", "entry_point": "pluck", "pass": true, "elapsed": 21.86, "completion_tokens": 439, "tps": 20.1, "err": ""}
+{"uid": "69", "tier": "算法与逻辑", "entry_point": "search", "pass": true, "elapsed": 11.14, "completion_tokens": 223, "tps": 20.0, "err": ""}
+{"uid": "70", "tier": "字符串", "entry_point": "strange_sort_list", "pass": true, "elapsed": 10.68, "completion_tokens": 219, "tps": 20.5, "err": ""}
+{"uid": "71", "tier": "其他", "entry_point": "triangle_area", "pass": true, "elapsed": 11.83, "completion_tokens": 247, "tps": 20.9, "err": ""}
+{"uid": "72", "tier": "其他", "entry_point": "will_it_fly", "pass": true, "elapsed": 15.69, "completion_tokens": 314, "tps": 20.0, "err": ""}
+{"uid": "73", "tier": "字符串", "entry_point": "smallest_change", "pass": true, "elapsed": 10.77, "completion_tokens": 209, "tps": 19.4, "err": ""}
+{"uid": "74", "tier": "其他", "entry_point": "total_match", "pass": true, "elapsed": 13.14, "completion_tokens": 263, "tps": 20.0, "err": ""}
+{"uid": "75", "tier": "数值与数学", "entry_point": "is_multiply_prime", "pass": true, "elapsed": 13.78, "completion_tokens": 287, "tps": 20.8, "err": ""}
+{"uid": "76", "tier": "数值与数学", "entry_point": "is_simple_power", "pass": true, "elapsed": 10.26, "completion_tokens": 238, "tps": 23.2, "err": ""}
+{"uid": "77", "tier": "算法与逻辑", "entry_point": "iscube", "pass": true, "elapsed": 7.38, "completion_tokens": 168, "tps": 22.8, "err": ""}
+{"uid": "78", "tier": "其他", "entry_point": "hex_key", "pass": true, "elapsed": 18.96, "completion_tokens": 382, "tps": 20.1, "err": ""}
+{"uid": "79", "tier": "其他", "entry_point": "decimal_to_binary", "pass": true, "elapsed": 9.62, "completion_tokens": 188, "tps": 19.5, "err": ""}
+{"uid": "80", "tier": "算法与逻辑", "entry_point": "is_happy", "pass": true, "elapsed": 8.63, "completion_tokens": 182, "tps": 21.1, "err": ""}
+{"uid": "81", "tier": "数值与数学", "entry_point": "numerical_letter_grade", "pass": true, "elapsed": 23.14, "completion_tokens": 529, "tps": 22.9, "err": ""}
+{"uid": "82", "tier": "数值与数学", "entry_point": "prime_length", "pass": true, "elapsed": 8.65, "completion_tokens": 168, "tps": 19.4, "err": ""}
+{"uid": "83", "tier": "其他", "entry_point": "starts_one_ends", "pass": true, "elapsed": 11.36, "completion_tokens": 237, "tps": 20.9, "err": ""}
+{"uid": "84", "tier": "其他", "entry_point": "solve", "pass": true, "elapsed": 10.87, "completion_tokens": 214, "tps": 19.7, "err": ""}
+{"uid": "85", "tier": "其他", "entry_point": "add", "pass": true, "elapsed": 4.91, "completion_tokens": 101, "tps": 20.6, "err": ""}
+{"uid": "86", "tier": "列表与集合", "entry_point": "anti_shuffle", "pass": true, "elapsed": 9.57, "completion_tokens": 183, "tps": 19.1, "err": ""}
+{"uid": "87", "tier": "其他", "entry_point": "get_row", "pass": true, "elapsed": 17.4, "completion_tokens": 354, "tps": 20.3, "err": ""}
+{"uid": "88", "tier": "列表与集合", "entry_point": "sort_array", "pass": true, "elapsed": 14.47, "completion_tokens": 332, "tps": 22.9, "err": ""}
+{"uid": "89", "tier": "其他", "entry_point": "encrypt", "pass": true, "elapsed": 10.84, "completion_tokens": 223, "tps": 20.6, "err": ""}
+{"uid": "90", "tier": "其他", "entry_point": "next_smallest", "pass": true, "elapsed": 7.31, "completion_tokens": 160, "tps": 21.9, "err": ""}
+{"uid": "91", "tier": "算法与逻辑", "entry_point": "is_bored", "pass": true, "elapsed": 11.86, "completion_tokens": 242, "tps": 20.4, "err": ""}
+{"uid": "92", "tier": "其他", "entry_point": "any_int", "pass": true, "elapsed": 10.95, "completion_tokens": 221, "tps": 20.2, "err": ""}
+{"uid": "93", "tier": "算法与逻辑", "entry_point": "encode", "pass": true, "elapsed": 57.49, "completion_tokens": 1230, "tps": 21.4, "err": ""}
+{"uid": "94", "tier": "其他", "entry_point": "skjkasdkd", "pass": true, "elapsed": 20.97, "completion_tokens": 498, "tps": 23.7, "err": ""}
+{"uid": "95", "tier": "算法与逻辑", "entry_point": "check_dict_case", "pass": true, "elapsed": 12.14, "completion_tokens": 281, "tps": 23.1, "err": ""}
+{"uid": "96", "tier": "算法与逻辑", "entry_point": "count_up_to", "pass": true, "elapsed": 12.3, "completion_tokens": 291, "tps": 23.7, "err": ""}
+{"uid": "97", "tier": "其他", "entry_point": "multiply", "pass": true, "elapsed": 7.32, "completion_tokens": 152, "tps": 20.8, "err": ""}
+{"uid": "98", "tier": "算法与逻辑", "entry_point": "count_upper", "pass": true, "elapsed": 5.59, "completion_tokens": 118, "tps": 21.1, "err": ""}
+{"uid": "99", "tier": "其他", "entry_point": "closest_integer", "pass": true, "elapsed": 9.71, "completion_tokens": 218, "tps": 22.5, "err": ""}
+{"uid": "100", "tier": "其他", "entry_point": "make_a_pile", "pass": true, "elapsed": 8.01, "completion_tokens": 176, "tps": 22.0, "err": ""}
+{"uid": "101", "tier": "字符串", "entry_point": "words_string", "pass": true, "elapsed": 8.13, "completion_tokens": 177, "tps": 21.8, "err": ""}
+{"uid": "102", "tier": "数值与数学", "entry_point": "choose_num", "pass": true, "elapsed": 8.05, "completion_tokens": 187, "tps": 23.2, "err": ""}
+{"uid": "103", "tier": "其他", "entry_point": "rounded_avg", "pass": true, "elapsed": 10.64, "completion_tokens": 250, "tps": 23.5, "err": ""}
+{"uid": "104", "tier": "数值与数学", "entry_point": "unique_digits", "pass": true, "elapsed": 8.13, "completion_tokens": 184, "tps": 22.6, "err": ""}
+{"uid": "105", "tier": "其他", "entry_point": "by_length", "pass": true, "elapsed": 20.21, "completion_tokens": 484, "tps": 23.9, "err": ""}
+{"uid": "106", "tier": "其他", "entry_point": "f", "pass": true, "elapsed": 10.57, "completion_tokens": 243, "tps": 23.0, "err": ""}
+{"uid": "107", "tier": "字符串", "entry_point": "even_odd_palindrome", "pass": true, "elapsed": 14.12, "completion_tokens": 326, "tps": 23.1, "err": ""}
+{"uid": "108", "tier": "数值与数学", "entry_point": "count_nums", "pass": true, "elapsed": 12.78, "completion_tokens": 294, "tps": 23.0, "err": ""}
+{"uid": "109", "tier": "算法与逻辑", "entry_point": "move_one_ball", "pass": false, "err": "request: RemoteDisconnected: Remote end closed connection without response"}
+{"uid": "110", "tier": "其他", "entry_point": "exchange", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "111", "tier": "算法与逻辑", "entry_point": "histogram", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "112", "tier": "字符串", "entry_point": "reverse_delete", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "113", "tier": "算法与逻辑", "entry_point": "odd_count", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "114", "tier": "列表与集合", "entry_point": "minSubArraySum", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "115", "tier": "算法与逻辑", "entry_point": "max_fill", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "116", "tier": "列表与集合", "entry_point": "sort_array", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "117", "tier": "字符串", "entry_point": "select_words", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "118", "tier": "其他", "entry_point": "get_closest_vowel", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "119", "tier": "字符串", "entry_point": "match_parens", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "120", "tier": "算法与逻辑", "entry_point": "maximum", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "121", "tier": "其他", "entry_point": "solution", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "122", "tier": "其他", "entry_point": "add_elements", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "123", "tier": "其他", "entry_point": "get_odd_collatz", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "124", "tier": "其他", "entry_point": "valid_date", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "125", "tier": "字符串", "entry_point": "split_words", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "126", "tier": "算法与逻辑", "entry_point": "is_sorted", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "127", "tier": "其他", "entry_point": "intersection", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "128", "tier": "数值与数学", "entry_point": "prod_signs", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "129", "tier": "算法与逻辑", "entry_point": "minPath", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "130", "tier": "其他", "entry_point": "tri", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "131", "tier": "数值与数学", "entry_point": "digits", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "132", "tier": "列表与集合", "entry_point": "is_nested", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "133", "tier": "数值与数学", "entry_point": "sum_squares", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "134", "tier": "算法与逻辑", "entry_point": "check_if_last_char_is_a_letter", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "135", "tier": "算法与逻辑", "entry_point": "can_arrange", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "136", "tier": "其他", "entry_point": "largest_smallest_integers", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "137", "tier": "其他", "entry_point": "compare_one", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "138", "tier": "算法与逻辑", "entry_point": "is_equal_to_sum_even", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "139", "tier": "其他", "entry_point": "special_factorial", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "140", "tier": "其他", "entry_point": "fix_spaces", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "141", "tier": "算法与逻辑", "entry_point": "file_name_check", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "142", "tier": "数值与数学", "entry_point": "sum_squares", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "143", "tier": "字符串", "entry_point": "words_in_sentence", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "144", "tier": "其他", "entry_point": "simplify", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "145", "tier": "其他", "entry_point": "order_by_points", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "146", "tier": "列表与集合", "entry_point": "specialFilter", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "147", "tier": "算法与逻辑", "entry_point": "get_max_triples", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "148", "tier": "其他", "entry_point": "bf", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "149", "tier": "列表与集合", "entry_point": "sorted_list_sum", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "150", "tier": "其他", "entry_point": "x_or_y", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "151", "tier": "其他", "entry_point": "double_the_difference", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "152", "tier": "其他", "entry_point": "compare", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "153", "tier": "字符串", "entry_point": "Strongest_Extension", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "154", "tier": "算法与逻辑", "entry_point": "cycpattern_check", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "155", "tier": "算法与逻辑", "entry_point": "even_odd_count", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "156", "tier": "算法与逻辑", "entry_point": "int_to_mini_roman", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "157", "tier": "其他", "entry_point": "right_angle_triangle", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "158", "tier": "算法与逻辑", "entry_point": "find_max", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "159", "tier": "其他", "entry_point": "eat", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "160", "tier": "其他", "entry_point": "do_algebra", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "161", "tier": "其他", "entry_point": "solve", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "162", "tier": "字符串", "entry_point": "string_to_md5", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}
+{"uid": "163", "tier": "算法与逻辑", "entry_point": "generate_integers", "pass": false, "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"}

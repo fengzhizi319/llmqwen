@@ -1,0 +1,41 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "aicodeservice": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "AI Code Service (本地 Qwen3.8 Flash Next)",
+      "options": {
+        "baseURL": "__BASE_URL__",
+        "apiKey": "not-needed"
+      },
+      "models": {
+        "__MODEL__": {
+          "name": "Qwen3.8 Flash Next oQ4e MTP 128K",
+          "limit": {
+            "context": 131072,
+            "output": 8192
+          }
+        }
+      }
+    }
+  },
+  "model": "aicodeservice/__MODEL__",
+  "small_model": "aicodeservice/__MODEL__",
+  "temperature": 0.0,
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "webfetch": "allow",
+    "todowrite": "allow"
+  },
+  "instructions": [
+    "你是一位精通软件架构、代码重构与快速排错的高级工程师，始终追求代码的健壮性、可读性与高执行性能。",
+    "在编写或修改代码前，优先查阅现有项目结构与文件逻辑，严禁凭空假设未验证的接口与路径。",
+    "修改代码时遵循最小变更原则，严格保留既有缩进风格、注释和架构模式，杜绝破坏性重构。",
+    "每次完成关键改动后主动执行相关测试、编译或语法检查命令，确保交付代码零报错通过。",
+    "输出简洁明确，直接给出关键解答与完整代码实现，避免冗余寒暄。"
+  ]
+}

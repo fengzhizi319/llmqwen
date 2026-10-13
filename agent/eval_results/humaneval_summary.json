@@ -1,0 +1,332 @@
+{
+  "dataset": "humaneval",
+  "pass_at_1": 0.6585,
+  "passed": 108,
+  "total": 164,
+  "avg_elapsed_s": 6.67,
+  "avg_tps": 20.9,
+  "by_tier": {
+    "算法与逻辑": {
+      "total": 37,
+      "pass": 20,
+      "elapsed": 230.28,
+      "tokens": 4799,
+      "pass_rate": 0.5405,
+      "tps": 20.8
+    },
+    "字符串": {
+      "total": 20,
+      "pass": 12,
+      "elapsed": 111.92999999999999,
+      "tokens": 2439,
+      "pass_rate": 0.6,
+      "tps": 21.8
+    },
+    "数值与数学": {
+      "total": 25,
+      "pass": 21,
+      "elapsed": 216.22999999999996,
+      "tokens": 4592,
+      "pass_rate": 0.84,
+      "tps": 21.2
+    },
+    "其他": {
+      "total": 65,
+      "pass": 43,
+      "elapsed": 450.0799999999999,
+      "tokens": 9350,
+      "pass_rate": 0.6615,
+      "tps": 20.8
+    },
+    "列表与集合": {
+      "total": 17,
+      "pass": 12,
+      "elapsed": 86.02000000000001,
+      "tokens": 1710,
+      "pass_rate": 0.7059,
+      "tps": 19.9
+    }
+  },
+  "failures": [
+    {
+      "uid": "67",
+      "tier": "字符串",
+      "err": "ValueError: invalid literal for int() with base 10: 'and'"
+    },
+    {
+      "uid": "109",
+      "tier": "算法与逻辑",
+      "err": "request: RemoteDisconnected: Remote end closed connection without response"
+    },
+    {
+      "uid": "110",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "111",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "112",
+      "tier": "字符串",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "113",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "114",
+      "tier": "列表与集合",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "115",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "116",
+      "tier": "列表与集合",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "117",
+      "tier": "字符串",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "118",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "119",
+      "tier": "字符串",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "120",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "121",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "122",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "123",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "124",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "125",
+      "tier": "字符串",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "126",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "127",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "128",
+      "tier": "数值与数学",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "129",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "130",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "131",
+      "tier": "数值与数学",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "132",
+      "tier": "列表与集合",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "133",
+      "tier": "数值与数学",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "134",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "135",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "136",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "137",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "138",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "139",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "140",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "141",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "142",
+      "tier": "数值与数学",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "143",
+      "tier": "字符串",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "144",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "145",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "146",
+      "tier": "列表与集合",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "147",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "148",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "149",
+      "tier": "列表与集合",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "150",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "151",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "152",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "153",
+      "tier": "字符串",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "154",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "155",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "156",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "157",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "158",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "159",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "160",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "161",
+      "tier": "其他",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "162",
+      "tier": "字符串",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    },
+    {
+      "uid": "163",
+      "tier": "算法与逻辑",
+      "err": "request: URLError: <urlopen error [Errno 61] Connection refused>"
+    }
+  ]
+}

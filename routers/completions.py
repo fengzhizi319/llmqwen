@@ -62,11 +62,19 @@ async def create_completion(
     prompt_tokens = engine.count_tokens(prompt)
     manager.check_prompt_length(model_name, prompt_tokens)
 
+    # 温度与采样参数：Code Agent 模式下默认使用高性能低温配置 (0.0/0.2)
+    if req.temperature is not None:
+        effective_temp = req.temperature
+    elif manager.config.performance and manager.config.performance.code_agent_mode:
+        effective_temp = manager.config.performance.default_temperature
+    else:
+        effective_temp = 0.2
+
     cache_key = ResponseCache.generate_key(
         prefix="fim" if req.suffix else "cmpl",
         model=model_name,
         prompt=prompt,
-        temperature=req.temperature,
+        temperature=effective_temp,
         top_p=req.top_p,
         stop=req.stop,
         echo=req.echo,
@@ -87,7 +95,7 @@ async def create_completion(
                     tokens_gen = engine.async_stream_generate(
                         prompt=prompt,
                         max_tokens=req.max_tokens or 512,
-                        temperature=req.temperature,
+                        temperature=effective_temp,
                         top_p=req.top_p,
                         stop=req.stop,
                         seed=req.seed,
@@ -145,7 +153,7 @@ async def create_completion(
                     output_text = await engine.async_generate(
                         prompt=prompt,
                         max_tokens=req.max_tokens or 512,
-                        temperature=req.temperature,
+                        temperature=effective_temp,
                         top_p=req.top_p,
                         stop=req.stop,
                         seed=req.seed,

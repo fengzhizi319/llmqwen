@@ -57,6 +57,14 @@ webapp/webapp-gateway
 webapp/frontend/node_modules/
 webapp/dist/
 
+# opencode agent 生成的本地配置
+agent/opencode.json
+agent/.opencode/
+agent/.opencode-password
+
+# Qoder CLI 本地权限缓存
+.qoder/settings.local.json
+
 # Large model weights and checkpoints (downloaded locally)
 models/
 checkpoints/

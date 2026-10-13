@@ -87,6 +87,9 @@ class MLXModelEngine(BaseModelEngine):
         kv_group_size: int = 64,             # KV 量化分组大小 (越小精度越高、显存越大)
         prefill_step_size: int = 2048,       # 分块预填充步长 (压低长上下文峰值显存)
         enable_prompt_cache: bool = True,    # 是否启用 prompt KV cache 复用
+        enable_mtp: bool = True,             # 🚀 是否启用 MTP 投机推测加速
+        mtp_depth: int = 3,                  # 🚀 MTP 解码深度
+        code_agent_mode: bool = True,        # 🚀 Code Agent 专项优化
     ):
         # ── 配置参数 ──
         self.model_name = model_name
@@ -98,6 +101,9 @@ class MLXModelEngine(BaseModelEngine):
         self.kv_group_size = kv_group_size
         self.prefill_step_size = prefill_step_size
         self.enable_prompt_cache = enable_prompt_cache
+        self.enable_mtp = enable_mtp
+        self.mtp_depth = mtp_depth
+        self.code_agent_mode = code_agent_mode
 
         # ── 模型与 Tokenizer (延迟加载) ──
         self.model = None               # MLX 模型实例 (mlx_lm.Model 或 mlx_vlm.Model)
@@ -109,6 +115,11 @@ class MLXModelEngine(BaseModelEngine):
         self._loaded = False            # 模型是否已加载
         self.resolved_path = None       # 解析后的本地模型绝对路径
         self.mtp_head = None            # MTP 推测解码头 (MTPHead 实例或 None)
+
+        # ── Code Agent 会话级持久化 Prompt 前缀 KV Cache ──
+        self._cached_prompt_tokens: Optional[List[int]] = None
+        self._cached_prompt_cache: Optional[Any] = None
+        self._prefix_cache_hits = 0
 
         # ── 性能统计指标 ──
         self._total_requests = 0                # 累计请求数
@@ -474,59 +485,58 @@ class MLXModelEngine(BaseModelEngine):
             n_generated = 0
 
             # ══════════════════════════════════════════════════════════
-            # Phase 3: 2-token/cycle 生成循环
+            # Phase 3: 严格校验的推测生成循环 (Exact Speculative Decoding)
             # ══════════════════════════════════════════════════════════
-            # 每次迭代:
-            #   1. 将 [current_token, prev_sampled] 拼接为 2-token 输入
-            #   2. 一次前向传播获得两个位置的 logits
-            #   3. 从 pos 0 采样 token_A (等价于标准生成)
-            #   4. 从 pos 1 采样 token_B (基于 token_A 的扩展上下文)
-            #   5. trim cache 1 entry → 净增长 1 (与标准生成一致)
+            # 保证 100% 数学无漂移与字节级精准输出:
+            #   1. 上轮预测与当前真实 token 命中 -> 双 token 一起采纳 (2x 吞吐)
+            #   2. 上轮预测与真实 token 分歧 -> 回滚 Cache 条目并输出真实 token
             while n_generated < max_tokens:
                 # ── Step 1: 2-token 前向传播 ──
                 pair = mx.concat([current_token, prev_sampled])  # shape [2]
                 logits = self.model(pair[None], cache=main_cache)  # shape [1, 2, vocab]
                 quantize_cache_fn(main_cache)
 
-                # logits[0]: 仅 attend to cache (不含 pair[1]=prev_sampled)
-                # logits[1]: attend to cache + pair[0]=current_token
                 logits_0 = logits[:, 0, :]
                 logits_1 = logits[:, 1, :]
                 mx.eval(logits_0, logits_1)
 
-                # ── Step 2: 从 pos 0 采样 token_A ──
+                # ── Step 2: 采样真实主模型 token_A ──
                 logprobs_0 = logits_0 - mx.logsumexp(logits_0, keepdims=True)
                 token_a = sampler(logprobs_0)
                 mx.eval(token_a)
 
-                # ── Step 3: Trim cache — 移除 prev_sampled 的 KV entry ──
-                # 前向传播后 cache 增长了 2 entries (pair[0] 和 pair[1])
-                # trim 1 个 → 仅保留 current_token 的 KV，移除 prev_sampled 的
-                # 这样下一轮迭代的 cache 状态与标准生成完全一致
-                trim_prompt_cache(main_cache, 1)
+                # ── Step 3: 校验草稿是否匹配 ──
+                is_match = (token_a.item() == prev_sampled.item())
 
-                # ── Step 4: Yield token_A ──
-                yield token_a.item(), logprobs_0.squeeze(0), True
-                n_generated += 1
-                if n_generated >= max_tokens:
-                    break
+                if is_match:
+                    # 🚀 命中! 接受 token_A 与后续 token_B
+                    yield token_a.item(), logprobs_0.squeeze(0), True
+                    n_generated += 1
+                    if n_generated >= max_tokens:
+                        break
 
-                # ── Step 5: 从 pos 1 采样 token_B ──
-                # pos 1 的 attention 覆盖了 cache + current_token + token_A
-                logprobs_1 = logits_1 - mx.logsumexp(logits_1, keepdims=True)
-                token_b = sampler(logprobs_1)
-                mx.eval(token_b)
+                    # 采纳 pos 1 产生的下一个候选
+                    logprobs_1 = logits_1 - mx.logsumexp(logits_1, keepdims=True)
+                    token_b = sampler(logprobs_1)
+                    mx.eval(token_b)
 
-                yield token_b.item(), logprobs_1.squeeze(0), True
-                n_generated += 1
+                    yield token_b.item(), logprobs_1.squeeze(0), True
+                    n_generated += 1
 
-                # ── Step 6: 更新迭代状态 ──
-                # token_B 成为下一轮的 current_token (新的生成起点)
-                current_token = token_b
-                prev_sampled = token_b
+                    current_token = token_b
+                    prev_sampled = token_b
+                else:
+                    # ⚠️ 分歧! 拒绝错误草稿，回滚 Cache 保证输出与串行完全一致
+                    trim_prompt_cache(main_cache, 1)
+                    yield token_a.item(), logprobs_0.squeeze(0), False
+                    n_generated += 1
+
+                    current_token = token_a
+                    prev_sampled = token_a
 
                 # 每 256 tokens 清理一次 MLX 计算图临时内存，防止内存泄漏
                 if n_generated % 256 == 0:
+                    mx.clear_cache()
                     mx.clear_cache()
 
     def _stream_generate_mtp_path(
