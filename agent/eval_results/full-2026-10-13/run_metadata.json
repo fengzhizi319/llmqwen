@@ -1,5 +1,5 @@
 {
-  "started_utc": "2026-10-13T15:00:17.003184+00:00",
+  "started_utc": "2026-10-14T14:13:18.164704+00:00",
   "configuration": {
     "performance": {
       "enable_cache": false,
@@ -41,7 +41,7 @@
     "mbpp": 974
   },
   "backend_restarts": 0,
-  "tracked_worktree_diff_sha256": "478f04785b46511b483dc75ce3ab56f93176db083ca3108c7315448839304bca",
+  "tracked_worktree_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "source_sha256": {
     "engine/qwen4_exp_engine.py": "0773ee7151927b3378dee59c93e1f0c4bc299a57d06707a0aae3033da2debc44",
     "engine/prefix_cache.py": "e1cca269b542e6700371e194172b284800b59cf6b5953d0b8c04d07ffde63911",
@@ -58,7 +58,73 @@
     "model.safetensors.index.json": "72315d4eb5f494fd7b9c97b36edc74a606c9894eb714d2893c06abf7468da9c6",
     "omlx_support/qwen4_exp.py": "1286f07531160166cdd5f18d2a74da131e74909cdf1269918eaaf9c91460d406"
   },
-  "status": "stopped_by_user",
-  "stopped_utc": "2026-10-13T23:04:17.982872+00:00",
-  "stop_reason": "用户要求停止剩余题目，评估已完成结果"
+  "final_metrics": {
+    "uptime_seconds": 4293,
+    "configured_models_count": 1,
+    "loaded_engines_count": 1,
+    "loaded_engines": [
+      "qwen3.8-flash-next-oq4e-mtp-128k"
+    ],
+    "server_host": "127.0.0.1",
+    "server_port": 1247,
+    "performance": {
+      "cache": {
+        "enabled": false,
+        "current_size": 0,
+        "max_size": 1024,
+        "ttl_seconds": 3600,
+        "hits": 0,
+        "misses": 0,
+        "hit_rate": 0.0
+      },
+      "metal_memory": {
+        "active_memory_mb": 90548.3,
+        "cache_memory_mb": 2050.53,
+        "peak_memory_mb": 93471.09
+      },
+      "engine_stats": {
+        "qwen3.8-flash-next-oq4e-mtp-128k": {
+          "model_name": "qwen3.8-flash-next-oq4e-mtp-128k",
+          "engine_type": "qwen4_exp",
+          "loaded": true,
+          "has_mtp": true,
+          "enable_mtp": true,
+          "mtp_depth": 3,
+          "mtp_drafted_tokens": 118458,
+          "mtp_accepted_tokens": 65194,
+          "code_agent_mode": true,
+          "prefix_cache_hits": 563,
+          "prefix_cache": {
+            "entries": 4,
+            "max_entries": 4,
+            "max_tokens_per_entry": 8192,
+            "hits": 563,
+            "misses": 1,
+            "reused_tokens": 45603,
+            "retained_tokens": 641,
+            "state_bytes": 490881088
+          },
+          "last_reused_tokens": 81,
+          "last_prefill_tokens": 120,
+          "last_prefill_seconds": 0.578915,
+          "resolved_path": "/Users/charles/.cache/modelscope/models/jedisct1--Qwen3.8-Flash-Next-oQ4e-MTP-128k/snapshots/master",
+          "kv_bits": 8,
+          "prefill_step_size": 2048,
+          "enable_thinking": true,
+          "strip_thinking": false,
+          "total_requests": 564,
+          "total_prompt_tokens": 122072,
+          "total_generation_tokens": 104550,
+          "last_prompt_tps": 195.63,
+          "last_generation_tps": 26.39,
+          "active_memory_mb": 90548.3,
+          "cache_memory_mb": 2050.53,
+          "peak_memory_mb": 93471.09
+        }
+      },
+      "max_concurrency": 1
+    }
+  },
+  "completed_utc": "2026-10-14T15:24:52.596098+00:00",
+  "status": "complete"
 }

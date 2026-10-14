@@ -1,16 +1,16 @@
 {
   "dataset": "mbpp",
-  "pass_at_1": 0.8146,
-  "passed": 334,
-  "total": 410,
+  "pass_at_1": 0.8563,
+  "passed": 834,
+  "total": 974,
   "expected_total": 974,
-  "completed_generation_and_test": 410,
+  "completed_generation_and_test": 974,
   "infrastructure_errors": 0,
-  "missing": 564,
-  "complete": false,
+  "missing": 0,
+  "complete": true,
   "test_timeouts": 0,
-  "avg_elapsed_s": 10.49,
-  "avg_tps": 19.2,
+  "avg_elapsed_s": 8.8,
+  "avg_tps": 21.9,
   "by_tier": {
     "基础(id1-300)": {
       "total": 300,
@@ -21,12 +21,20 @@
       "tps": 23.9
     },
     "中级(id301-600)": {
-      "total": 110,
-      "pass": 93,
-      "elapsed": 1808.2499999999998,
-      "tokens": 23190,
-      "pass_rate": 0.8455,
-      "tps": 12.8
+      "total": 300,
+      "pass": 260,
+      "elapsed": 3377.0300000000016,
+      "tokens": 59845,
+      "pass_rate": 0.8667,
+      "tps": 17.7
+    },
+    "综合(id601-974)": {
+      "total": 374,
+      "pass": 333,
+      "elapsed": 2700.389999999999,
+      "tokens": 67895,
+      "pass_rate": 0.8904,
+      "tps": 25.1
     }
   },
   "failures": [
@@ -409,6 +417,326 @@
       "uid": "mbpp_386",
       "tier": "中级(id301-600)",
       "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_415",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_430",
+      "tier": "中级(id301-600)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 91)"
+    },
+    {
+      "uid": "mbpp_436",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError: -6"
+    },
+    {
+      "uid": "mbpp_438",
+      "tier": "中级(id301-600)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 112)"
+    },
+    {
+      "uid": "mbpp_448",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_452",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_461",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_462",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_469",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_483",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_493",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_515",
+      "tier": "中级(id301-600)",
+      "err": "IndexError: list index out of range"
+    },
+    {
+      "uid": "mbpp_535",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_538",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_546",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_553",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_570",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_571",
+      "tier": "中级(id301-600)",
+      "err": "SyntaxError: invalid syntax"
+    },
+    {
+      "uid": "mbpp_574",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_575",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_581",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_590",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_592",
+      "tier": "中级(id301-600)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_603",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_609",
+      "tier": "综合(id601-974)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 141)"
+    },
+    {
+      "uid": "mbpp_611",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_617",
+      "tier": "综合(id601-974)",
+      "err": "SyntaxError: invalid syntax"
+    },
+    {
+      "uid": "mbpp_638",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_642",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_646",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_650",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_659",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_671",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_704",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_712",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_714",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_717",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_738",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_743",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_746",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_761",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_769",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_776",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_777",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_799",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_838",
+      "tier": "综合(id601-974)",
+      "err": "SyntaxError: invalid syntax"
+    },
+    {
+      "uid": "mbpp_840",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_851",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_858",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_859",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_867",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_882",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_899",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_907",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_910",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_912",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_916",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_918",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_922",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_927",
+      "tier": "综合(id601-974)",
+      "err": "NameError: name 'Node' is not defined. Did you mean: 'None'?"
+    },
+    {
+      "uid": "mbpp_937",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_944",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_950",
+      "tier": "综合(id601-974)",
+      "err": "AssertionError"
+    },
+    {
+      "uid": "mbpp_968",
+      "tier": "综合(id601-974)",
+      "err": "SyntaxError: unterminated triple-quoted string literal (detected at line 104)"
     }
   ]
 }
